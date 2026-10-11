@@ -1,0 +1,47 @@
+package dev.irondome.mailcanon;
+
+import static org.junit.jupiter.api.Assertions.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HexFormat;
+import java.util.Locale;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+
+final class MailCanonTest {
+    @TestFactory Stream<DynamicTest> vectors() throws Exception {
+        return Files.readAllLines(Path.of("..", "testdata", "vectors.tsv")).stream()
+            .filter(row -> !row.startsWith("#")).map(row -> {
+                String[] v = row.split("\t", -1);
+                return DynamicTest.dynamicTest(v[0], () -> {
+                    String raw = new String(HexFormat.of().parseHex(v[1]), StandardCharsets.UTF_8);
+                    if (v[2].equals("-")) {
+                        assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.normalize(raw));
+                        assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.canonicalize(raw));
+                    } else {
+                        assertEquals(new MailCanon.Identity(v[2], v[3], v[4]), MailCanon.normalize(raw));
+                        assertEquals(v[3], MailCanon.canonicalize(raw));
+                        assertEquals(v[3], MailCanon.canonicalize(v[3]));
+                    }
+                });
+            });
+    }
+
+    @Test void nullAndInvalidUtf16() {
+        assertThrows(NullPointerException.class, () -> MailCanon.normalize(null));
+        assertThrows(NullPointerException.class, () -> MailCanon.canonicalize(null));
+        for (String raw : new String[]{"\ud800@example.com", "name \udfff <u@example.com>"})
+            assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.normalize(raw));
+    }
+
+    @Test void localeDoesNotChangeAsciiCasing() {
+        Locale previous = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            assertEquals("identity@gmail.com", MailCanon.canonicalize("IDENTITY@GMAIL.COM"));
+        } finally { Locale.setDefault(previous); }
+    }
+}

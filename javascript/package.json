@@ -1,0 +1,47 @@
+{
+  "name": "@irondome/mail-canon",
+  "version": "0.1.0",
+  "description": "Bounded, provider-aware email normalization",
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      }
+    }
+  },
+  "files": [
+    "index.cjs",
+    "index.js",
+    "index.d.ts",
+    "index.d.cts",
+    "README.md",
+    "API.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "tr46": "^5.1.1"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "bench": "node test/bench.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IrondomeDev/mail-canon.git",
+    "directory": "javascript"
+  }
+}

@@ -1,0 +1,4 @@
+include README.md API.md LICENSE
+recursive-include src *.py py.typed
+
+prune tests
