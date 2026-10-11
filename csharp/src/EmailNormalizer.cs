@@ -120,10 +120,10 @@ public static class EmailNormalizer
         foreach (char c in domain) unicodeDomain |= c > 127;
         if (unicodeDomain)
         {
-            for (int start = 0; start < domain.Length;)
+            for (int offset = 0; offset < domain.Length;)
             {
-                int dot = domain[start..].IndexOf('.');
-                ReadOnlySpan<char> label = dot < 0 ? domain[start..] : domain.Slice(start, dot);
+                int dot = domain[offset..].IndexOf('.');
+                ReadOnlySpan<char> label = dot < 0 ? domain[offset..] : domain.Slice(offset, dot);
                 bool rtl = false, latinAscii = false;
                 foreach (char c in label)
                 {
@@ -132,7 +132,7 @@ public static class EmailNormalizer
                 }
                 if (rtl && latinAscii) throw new InvalidEmailException();
                 if (dot < 0) break;
-                start += dot + 1;
+                offset += dot + 1;
             }
             try { domain = Idn.GetAscii(domain.ToString()).AsSpan(); }
             catch (ArgumentException) { throw new InvalidEmailException(); }
