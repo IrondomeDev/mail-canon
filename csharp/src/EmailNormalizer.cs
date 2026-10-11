@@ -85,7 +85,7 @@ public static class EmailNormalizer
             changed |= mapped != c;
             cleaned[used++] = mapped;
         }
-        if (changed) value = cleaned[..used];
+        if (changed) value = new string(cleaned[..used]).AsSpan();
         value = Trim(value);
         if (HasMailtoPrefix(value))
         {
