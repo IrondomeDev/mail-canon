@@ -15,6 +15,9 @@ public static class EmailNormalizer
 {
     private static readonly IdnMapping Idn = new() { UseStd3AsciiRules = true, AllowUnassigned = false };
 
+    private static bool ContainsRtl(char c) => c is >= '\u0590' and <= '\u08ff'
+        or >= '\ufb1d' and <= '\ufdff' or >= '\ufe70' and <= '\ufeff';
+
     private static bool AsciiSpace(char c) => c is ' ' or '\t' or '\n' or '\r' or '\f';
     private static bool UnicodeSpace(char c) => c is >= '\u0009' and <= '\u000d'
         or '\u0020' or '\u0085' or '\u00a0' or '\u1680'
@@ -117,6 +120,20 @@ public static class EmailNormalizer
         foreach (char c in domain) unicodeDomain |= c > 127;
         if (unicodeDomain)
         {
+            for (int start = 0; start < domain.Length;)
+            {
+                int dot = domain[start..].IndexOf('.');
+                ReadOnlySpan<char> label = dot < 0 ? domain[start..] : domain.Slice(start, dot);
+                bool rtl = false, latinAscii = false;
+                foreach (char c in label)
+                {
+                    rtl |= ContainsRtl(c);
+                    latinAscii |= c is >= 'A' and <= 'Z' or >= 'a' and <= 'z';
+                }
+                if (rtl && latinAscii) throw new InvalidEmailException();
+                if (dot < 0) break;
+                start += dot + 1;
+            }
             try { domain = Idn.GetAscii(domain.ToString()).AsSpan(); }
             catch (ArgumentException) { throw new InvalidEmailException(); }
         }

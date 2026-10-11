@@ -74,7 +74,6 @@ function parse(raw, identity) {
     domain = idna.toASCII(domain, IDNA_OPTIONS);
     if (!domain) throw new InvalidEmail();
   }
-  if (domain.endsWith('.')) domain = domain.slice(0, -1);
   if (!domain || domain.length > 253 || !domain.includes('.') || /[^A-Za-z0-9.\-]/.test(domain)) throw new InvalidEmail();
   domain = domain.toLowerCase();
   let start = 0;
