@@ -1,0 +1,9 @@
+{
+  "name": "irondome/mail-canon",
+  "description": "Bounded, provider-aware email normalization",
+  "type": "library",
+  "license": "MIT",
+  "require": {"php": ">=8.2", "ext-intl": "*"},
+  "autoload": {"psr-4": {"IronDome\\MailCanon\\": "src/"}},
+  "scripts": {"test": "php tests/run.php"}
+}

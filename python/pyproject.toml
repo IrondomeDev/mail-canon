@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "irondome-mail-canon"
+version = "0.1.0"
+description = "Bounded, provider-aware email normalization"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Iron Dome"}]
+dependencies = ["idna>=3.10,<4"]
+
+[project.urls]
+Repository = "https://github.com/IrondomeDev/mail-canon"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mail_canon = ["py.typed"]
+
+[tool.setuptools.data-files]
+"share/doc/irondome-mail-canon" = ["API.md"]
