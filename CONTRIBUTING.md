@@ -18,7 +18,7 @@ Measure changed code with representative plain ASCII, provider-alias, and Unicod
 
 Preserve the ASCII fast path. Rust's caller-buffer operation must remain allocation-free for ordinary ASCII input without Punycode and must not mutate the output on error. Do not introduce regexes with unbounded backtracking or remove input-size checks.
 
-## Before the first release
+## Release checks
 
 Confirm the license and package namespaces. Run all CI jobs against the declared dependencies, including both Windows and Linux for C#. Review dependency advisories and record the resolved versions in release evidence. Commit the Go submodule's generated `go.sum` and check that `go mod tidy` leaves both module files unchanged. Never fabricate checksums. The Go dependency floor is `golang.org/x/net v0.57.0` (Go 1.25+); unlike v0.55.0, it rejects ASCII-only Punycode decoding with older Unicode tables too. Python requires `idna>=3.15,<4` for the audited security fixes.
 

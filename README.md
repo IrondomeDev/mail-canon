@@ -1,9 +1,12 @@
 # IronDome Mail Canon
 
 [![Releases](https://img.shields.io/badge/releases-package_versions-F76808)](https://github.com/IrondomeDev/mail-canon/releases)
+[![npm](https://img.shields.io/npm/v/mail-canon?color=F76808)](https://www.npmjs.com/package/mail-canon)
+[![crates.io](https://img.shields.io/crates/v/mail-canon?color=F76808)](https://crates.io/crates/mail-canon)
+[![Go Reference](https://img.shields.io/badge/Go-reference-F76808)](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F76808)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
-[![CI](https://img.shields.io/badge/CI-package_checks-F76808)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
+[![CI](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
 
 **Provider-aware email normalization in seven languages.**
 
@@ -32,11 +35,23 @@ Provider:   gmail
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
 | [csharp](csharp/README.md) | `mail-canon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
-Package releases are independent. See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes. Python publication is pending organization approval; Java, PHP, and C# currently use the source installation instructions in their package guides.
+Package releases are independent:
+
+| Language | Registry | Status |
+| --- | --- | --- |
+| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | Released: `0.1.0` |
+| Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.0` |
+| Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.0) | Released: `v0.1.0` |
+| Python | PyPI | Pending organization approval; install from source |
+| PHP | Composer / Packagist | Source only; distribution mirror and registry setup needed |
+| Java | Maven Central | Source only; namespace, signing, and deployment setup needed |
+| C# | NuGet | Source only; registry credentials needed |
+
+See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
 ## Quick start
 
-Install from the checkout before trying these examples:
+Python is available from the checkout while PyPI approval is pending:
 
 ```sh
 python -m pip install ./python
@@ -60,6 +75,19 @@ import { normalizeStrict } from 'mail-canon';
 
 const result = normalizeStrict('Alice.Example+news@GoogleMail.com');
 console.log(result.canonical); // aliceexample@gmail.com
+```
+
+For Rust, add to your application's `Cargo.toml`:
+
+```toml
+[dependencies]
+mail-canon = "0.1.0"
+```
+
+For Go, run from an existing application module:
+
+```sh
+go get github.com/IrondomeDev/mail-canon/go@v0.1.0
 ```
 
 Use strict APIs for untrusted address fields. Display-name imports have a separate, more permissive parsing policy described below.

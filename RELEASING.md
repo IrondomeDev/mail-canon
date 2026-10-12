@@ -32,6 +32,8 @@ Existing CI only builds and tests; it does not publish artifacts. Publish from t
 - Java: verify the `dev.irondome` namespace in [Maven Central](https://central.sonatype.org/register/namespace/), configure signing, and supply Central publishing credentials. Maven or Gradle can consume the artifacts. The current build does not yet configure Central deployment.
 - C#: create the package with `dotnet pack src/MailCanon.csproj -c Release -o artifacts` from `csharp/`, then use `dotnet nuget push` with a scoped [NuGet.org API key](https://learn.microsoft.com/en-us/nuget/nuget-org/publish-a-package). Confirm the intended package owner before publishing.
 
+npm can briefly expose a `0.0.0-stage` placeholder while processing a new package, even after a successful ordinary publish. Wait and recheck the public version and `latest` tag before assuming another approval is required. For an explicitly staged release, use npm CLI 11.15+ to inspect it with `npm stage list mail-canon` and `npm stage view <stage-id>`, then approve the reviewed artifact with `npm stage approve <stage-id>` and complete 2FA. The account's Staged Packages tab offers the same approval flow. Announce only the verified library version. See [npm staged publishing](https://docs.npmjs.com/staged-publishing/).
+
 Never commit registry tokens, API keys, or signing keys. Configure them in local credential stores or the publishing environment.
 
 ## First public release
