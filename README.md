@@ -4,6 +4,7 @@
 [![npm](https://img.shields.io/npm/v/mail-canon?color=F76808)](https://www.npmjs.com/package/mail-canon)
 [![crates.io](https://img.shields.io/crates/v/mail-canon?color=F76808)](https://crates.io/crates/mail-canon)
 [![Go Reference](https://img.shields.io/badge/Go-reference-F76808)](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go)
+[![Packagist](https://img.shields.io/packagist/v/irondome/mail-canon?color=F76808)](https://packagist.org/packages/irondome/mail-canon)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F76808)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
 [![CI](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
@@ -43,7 +44,7 @@ Package releases are independent:
 | Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.0` |
 | Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.0) | Released: `v0.1.0` |
 | Python | PyPI | Pending organization approval; install from source |
-| PHP | Composer / Packagist | [Distribution mirror](https://github.com/IrondomeDev/mail-canon-php); awaiting Packagist registration |
+| PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.0` |
 | Java | Maven Central | Source only; namespace, signing, and deployment setup needed |
 | C# | NuGet | Source only; registry credentials needed |
 

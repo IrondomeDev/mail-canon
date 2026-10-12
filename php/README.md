@@ -8,18 +8,13 @@ PHP 8.2+ with the `intl` extension and Composer.
 
 ## Install and use
 
-Use a Composer path repository in your application before a registry release exists:
+Install the published [Packagist package](https://packagist.org/packages/irondome/mail-canon):
 
-```json
-{
-  "repositories": [{"type": "path", "url": "/path/to/mail-canon/php", "options": {"versions": {"irondome/mail-canon": "0.1.0"}}}],
-  "require": {"irondome/mail-canon": "0.1.0"}
-}
+```sh
+composer require irondome/mail-canon:^0.1
 ```
 
-The [PHP distribution repository](https://github.com/IrondomeDev/mail-canon-php) provides a root-level `composer.json` for Packagist. It is generated from this monorepo; submit changes to the development repository. Until the package is registered on Packagist, use the path repository above.
-
-Run `composer install`, then:
+The [PHP distribution repository](https://github.com/IrondomeDev/mail-canon-php) is generated from this monorepo. Submit issues and changes to the development repository.
 
 ```php
 <?php
@@ -60,4 +55,4 @@ find src tests -name '*.php' -exec php -l {} \;
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-The Composer package name is `irondome/mail-canon`. Registry installation becomes available after Packagist registration. Licensed under [MIT](LICENSE).
+The Composer package name is `irondome/mail-canon`. Licensed under [MIT](LICENSE).
