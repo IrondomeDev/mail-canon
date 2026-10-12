@@ -1,5 +1,7 @@
 # Contributing
 
+Start with the [behavior contract](docs/BEHAVIOR.md) and the README for the language you are changing. Use a focused pull request with a description of the observable change and the checks you ran. Replace real email addresses with synthetic examples in issues, fixtures, and logs.
+
 Keep this project limited to local email normalization and canonicalization. No network checks, credentials, provider APIs, telemetry, or domain databases belong in these packages.
 
 ## Changing behavior
@@ -23,3 +25,5 @@ Confirm the license and package namespaces. Run all CI jobs against the declared
 Check wheels, npm tarballs, Rust packages, JARs, Composer source distributions, and NuGet packages for the expected public files. Java registry publication additionally needs the registry's required signing and metadata. Composer can use its documented local path repository before Packagist registration. The Go submodule's version tags use the `go/vX.Y.Z` convention when publishing versioned releases.
 
 Version changes to the matching policy explicitly. Existing users should not have their saved matching keys silently rewritten. Release automation and registry credentials are intentionally outside this change.
+
+See [RELEASING.md](RELEASING.md) for the monorepo release model, tag conventions, and the first-public-release checklist.

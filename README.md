@@ -1,6 +1,13 @@
-# mail-canon
+# IronDome Mail Canon
 
-Small email normalization packages for Python, Rust, JavaScript, Java, Go, PHP, and C#.
+[![Status: pre-release](https://img.shields.io/badge/status-pre--release-F76808)](#packages)
+[![License: MIT](https://img.shields.io/badge/license-MIT-F76808)](LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
+[![CI](https://img.shields.io/badge/CI-package_checks-F76808)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
+
+**Provider-aware email normalization in seven languages.**
+
+[Package guides](#packages) · [Behavior contract](docs/BEHAVIOR.md) · [Contributing](CONTRIBUTING.md) · [Release guide](RELEASING.md) · [IronDome](https://irondome.dev)
 
 Normalize an address and derive a provider-aware matching key. No HTTP calls, DNS queries, telemetry, or mailbox lookups. Each implementation is independent; there is no native service or shared runtime to deploy.
 
@@ -25,7 +32,41 @@ Provider:   gmail
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
 | [csharp](csharp/README.md) | `IronDome.MailCanon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
-This is an unreleased 0.1.0 source tree. Package names are proposed identifiers, not claims that registry releases or namespace ownership have been established. Each README shows local installation.
+**Pre-release:** this is an unreleased 0.1.0 source tree, kept private for review. Package names are proposed identifiers; registry availability and namespace ownership have not been established. Use the local installation instructions in each package guide.
+
+## Quick start
+
+Install from the checkout before trying these examples:
+
+```sh
+python -m pip install ./python
+```
+
+```python
+from mail_canon import normalize_strict
+
+result = normalize_strict("Alice.Example+news@GoogleMail.com")
+print(result.canonical)  # aliceexample@gmail.com
+```
+
+For JavaScript, build and install a local tarball:
+
+```sh
+cd javascript
+npm install
+npm pack
+# Run in your application directory, using the actual tarball path:
+npm install /path/to/irondome-mail-canon-0.1.0.tgz
+```
+
+```javascript
+import { normalizeStrict } from '@irondome/mail-canon';
+
+const result = normalizeStrict('Alice.Example+news@GoogleMail.com');
+console.log(result.canonical); // aliceexample@gmail.com
+```
+
+Use strict APIs for untrusted address fields. Display-name imports have a separate, more permissive parsing policy described below.
 
 ## Strict input validation
 
@@ -66,10 +107,18 @@ Native IDNA libraries differ in Unicode versions and acceptance rules. The share
 
 ## Tests and performance
 
-All seven test suites consume the shared [normalization](testdata/vectors.tsv) and [strict-address](testdata/strict-vectors.tsv) corpora. They cover provider rules, cleanup, malformed inputs, limits, and canonical-output idempotence. Each package README contains its test command. The proposed CI workflow runs complete suites without silently skipping IDNA cases.
+All seven test suites consume the shared [normalization](testdata/vectors.tsv) and [strict-address](testdata/strict-vectors.tsv) corpora. They cover provider rules, cleanup, malformed inputs, limits, and canonical-output idempotence. Each package README contains its test command. The [CI workflow](.github/workflows/ci.yml) checks all seven implementations across supported runtime versions, including Windows and Linux for C#, without silently skipping IDNA cases.
 
 Input is bounded at 512 UTF-8 bytes before cleanup. Ordinary ASCII domains bypass IDNA; ASCII Punycode labels are validated through IDNA. Rust additionally exposes a caller-buffer path with no heap allocation for ordinary ASCII input without Punycode. Benchmarks are included for Python, JavaScript, and Go. They measure local execution, not a latency guarantee or a cross-language ranking.
 
 ## Development and release
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for cross-language changes and [official references](docs/REFERENCES.md) for the language and provider documentation used. No workflow publishes packages, uses application secrets, or changes repository settings. Registry names, dependency resolution, and the proposed MIT license must be reviewed before a release.
+Development lives in one repository so implementations share a behavior contract, regression fixtures, and review history. Packages can release independently; see the [release guide](RELEASING.md) for versioning, registry requirements, and the public-release checklist.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for cross-language changes and [official references](docs/REFERENCES.md) for the language and provider documentation used. CI validates packages; registry publication is a separate release step.
+
+## License
+
+MIT © 2026 Iron Dome. See [LICENSE](LICENSE). Each language package includes the same license.
+
+Maintained by [IronDome](https://github.com/IrondomeDev).
