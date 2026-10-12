@@ -4,6 +4,8 @@
 [![npm](https://img.shields.io/npm/v/mail-canon?color=F76808)](https://www.npmjs.com/package/mail-canon)
 [![crates.io](https://img.shields.io/crates/v/mail-canon?color=F76808)](https://crates.io/crates/mail-canon)
 [![Go Reference](https://img.shields.io/badge/Go-reference-F76808)](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.irondome/mail-canon?color=F76808)](https://central.sonatype.com/artifact/dev.irondome/mail-canon)
+[![NuGet](https://img.shields.io/nuget/v/mail-canon?color=F76808)](https://www.nuget.org/packages/mail-canon)
 [![Packagist](https://img.shields.io/packagist/v/irondome/mail-canon?color=F76808)](https://packagist.org/packages/irondome/mail-canon)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F76808)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
@@ -42,13 +44,13 @@ Package releases are independent:
 
 | Language | Registry | Status |
 | --- | --- | --- |
-| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | `0.1.0` released; `0.1.1` processing |
+| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | Released: `0.1.1` |
 | Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.1` |
 | Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.1) | Released: `v0.1.1` |
 | Python | PyPI | Pending organization approval; install from source |
 | PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.1` |
 | Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | `0.1.0` released; `0.1.1` publishing |
-| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | `0.1.0` released; `0.1.1` processing |
+| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | Released: `0.1.1` |
 
 See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
