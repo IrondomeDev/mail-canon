@@ -68,12 +68,12 @@ function parse(raw, identity) {
   let domain = value.slice(at + 1).replace(ASCII_SPACE, '');
   if (!local.length || local.length > 64 || /[^A-Za-z0-9._%+\-]/.test(local) ||
       local[0] === '.' || local.endsWith('.') || local.includes('..') || !domain) throw new InvalidEmail();
+  if (domain.endsWith('.')) domain = domain.slice(0, -1);
   if (NON_ASCII.test(domain)) {
     idna ??= require('tr46');
     domain = idna.toASCII(domain, IDNA_OPTIONS);
     if (!domain) throw new InvalidEmail();
   }
-  if (domain.endsWith('.')) domain = domain.slice(0, -1);
   if (!domain || domain.length > 253 || !domain.includes('.') || /[^A-Za-z0-9.\-]/.test(domain)) throw new InvalidEmail();
   domain = domain.toLowerCase();
   let start = 0;
