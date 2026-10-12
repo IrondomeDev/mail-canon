@@ -1,5 +1,5 @@
 {
-  "name": "@irondome-dev/mail-canon",
+  "name": "mail-canon",
   "version": "0.1.0",
   "description": "Bounded, provider-aware email normalization",
   "type": "module",

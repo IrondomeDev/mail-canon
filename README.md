@@ -26,7 +26,7 @@ Provider:   gmail
 | --- | --- | --- |
 | [python](python/README.md) | `irondome-mail-canon` | `mail_canon.normalize`, `canonicalize` |
 | [rust](rust/README.md) | `irondome-mail-canon` | `mail_canon::{normalize, canonicalize, normalize_into}` |
-| [javascript](javascript/README.md) | `@irondome-dev/mail-canon` | ESM and CommonJS, TypeScript declarations |
+| [javascript](javascript/README.md) | `mail-canon` | ESM and CommonJS, TypeScript declarations |
 | [java](java/README.md) | `dev.irondome:mail-canon` | `MailCanon.normalize`, `canonicalize` |
 | [go](go/README.md) | `github.com/IrondomeDev/mail-canon/go` | `mailcanon.Normalize`, `Canonicalize` |
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
@@ -52,11 +52,11 @@ print(result.canonical)  # aliceexample@gmail.com
 For JavaScript:
 
 ```sh
-npm install @irondome-dev/mail-canon
+npm install mail-canon
 ```
 
 ```javascript
-import { normalizeStrict } from '@irondome-dev/mail-canon';
+import { normalizeStrict } from 'mail-canon';
 
 const result = normalizeStrict('Alice.Example+news@GoogleMail.com');
 console.log(result.canonical); // aliceexample@gmail.com

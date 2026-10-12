@@ -11,13 +11,13 @@ Node.js 20+ for the test runner; ESM, CommonJS, and bundler-based browser applic
 Install from npm:
 
 ```sh
-npm install @irondome-dev/mail-canon
+npm install mail-canon
 ```
 
 This installs the declared `tr46` dependency.
 
 ```js
-import {normalize, canonicalize, InvalidEmail} from '@irondome-dev/mail-canon';
+import {normalize, canonicalize, InvalidEmail} from 'mail-canon';
 
 const result = normalize('Alice.Example+news@GoogleMail.com');
 // {domain: 'googlemail.com', canonical: 'aliceexample@gmail.com', provider: 'gmail'}
@@ -31,7 +31,7 @@ try {
 }
 ```
 
-CommonJS uses `const {normalize} = require('@irondome-dev/mail-canon')`. TypeScript declarations cover both import styles. `normalize` is synchronous. Browser applications need a bundler that resolves CommonJS and `tr46`; the ESM wrapper is not a standalone browser script. No Node-specific API is used in the parser.
+CommonJS uses `const {normalize} = require('mail-canon')`. TypeScript declarations cover both import styles. `normalize` is synchronous. Browser applications need a bundler that resolves CommonJS and `tr46`; the ESM wrapper is not a standalone browser script. No Node-specific API is used in the parser.
 
 
 ## Address fields and display imports
