@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
-    <PackageId>IronDome.MailCanon</PackageId><Version>0.1.0</Version>
+    <PackageId>mail-canon</PackageId><Version>0.1.0</Version>
     <Description>Bounded, provider-aware email normalization</Description>
     <Authors>Iron Dome</Authors><PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/IrondomeDev/mail-canon</RepositoryUrl>

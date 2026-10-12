@@ -1,5 +1,5 @@
 [package]
-name = "irondome-mail-canon"
+name = "mail-canon"
 version = "0.1.0"
 edition = "2021"
 description = "Bounded, provider-aware email normalization"
@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/IrondomeDev/mail-canon"
 homepage = "https://github.com/IrondomeDev/mail-canon"
-documentation = "https://docs.rs/irondome-mail-canon"
+documentation = "https://docs.rs/mail-canon"
 keywords = ["email", "normalization", "canonicalization", "idna"]
 categories = ["email", "text-processing"]
 include = ["src/**", "Cargo.toml", "README.md", "API.md", "LICENSE"]

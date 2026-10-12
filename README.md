@@ -24,13 +24,13 @@ Provider:   gmail
 
 | Folder | Package name | Interface |
 | --- | --- | --- |
-| [python](python/README.md) | `irondome-mail-canon` | `mail_canon.normalize`, `canonicalize` |
-| [rust](rust/README.md) | `irondome-mail-canon` | `mail_canon::{normalize, canonicalize, normalize_into}` |
+| [python](python/README.md) | `mail-canon` | `mail_canon.normalize`, `canonicalize` |
+| [rust](rust/README.md) | `mail-canon` | `mail_canon::{normalize, canonicalize, normalize_into}` |
 | [javascript](javascript/README.md) | `mail-canon` | ESM and CommonJS, TypeScript declarations |
 | [java](java/README.md) | `dev.irondome:mail-canon` | `MailCanon.normalize`, `canonicalize` |
 | [go](go/README.md) | `github.com/IrondomeDev/mail-canon/go` | `mailcanon.Normalize`, `Canonicalize` |
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
-| [csharp](csharp/README.md) | `IronDome.MailCanon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
+| [csharp](csharp/README.md) | `mail-canon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
 Package releases are independent. See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes. Python publication is pending organization approval; Java, PHP, and C# currently use the source installation instructions in their package guides.
 
