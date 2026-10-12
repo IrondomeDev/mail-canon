@@ -391,3 +391,5 @@ control-2029-prefix	e280a9416c696365203c75406578616d706c652e636f6d3e	-	-	-
 control-2029-suffix	416c696365203c75406578616d706c652e636f6d3ee280a9	-	-	-
 control-2029-query	6d61696c746f3a75406578616d706c652e636f6d3f7375626a6563743de280a9	-	-	-
 ace-with-ascii-hyphens	7540786e2d2d62636865722d6b76612e61622d2d63642e74657374	xn--bcher-kva.ab--cd.test	u@xn--bcher-kva.ab--cd.test	custom
+malformed-ace-ignored-in-label	7540786e2d2d676d61696c2dc2ad2e636f6d	-	-	-
+malformed-ace-mapped-prefix	7540efbd98efbd8e2d2d676d61696c2d2e636f6dc2ad	-	-	-

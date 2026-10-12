@@ -45,7 +45,7 @@ fn main() -> Result<(), mail_canon::Error> {
 }
 ```
 
-The caller-buffer operation allocates no heap memory for ASCII input. The owned helpers allocate their returned strings. IDNA processing may allocate. All code is safe Rust.
+The caller-buffer operation allocates no heap memory for ordinary ASCII input without Punycode. The owned helpers allocate their returned strings. IDNA processing may allocate. All code is safe Rust.
 
 
 ## Address fields and display imports

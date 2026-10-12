@@ -18,7 +18,7 @@ Preserve the ASCII fast path. Rust's caller-buffer operation must remain allocat
 
 ## Before the first release
 
-Confirm the license and package namespaces. Run all CI jobs against the declared dependencies, including both Windows and Linux for C#. Review dependency advisories and record the resolved versions in release evidence. Commit the Go submodule's generated `go.sum` and check that `go mod tidy` leaves both module files unchanged. Never fabricate checksums. The Go dependency floor is `golang.org/x/net v0.55.0` (Go 1.25+); Python requires `idna>=3.15,<4` for the audited security fixes.
+Confirm the license and package namespaces. Run all CI jobs against the declared dependencies, including both Windows and Linux for C#. Review dependency advisories and record the resolved versions in release evidence. Commit the Go submodule's generated `go.sum` and check that `go mod tidy` leaves both module files unchanged. Never fabricate checksums. The Go dependency floor is `golang.org/x/net v0.57.0` (Go 1.25+); unlike v0.55.0, it rejects ASCII-only Punycode decoding with older Unicode tables too. Python requires `idna>=3.15,<4` for the audited security fixes.
 
 Check wheels, npm tarballs, Rust packages, JARs, Composer source distributions, and NuGet packages for the expected public files. Java registry publication additionally needs the registry's required signing and metadata. Composer can use its documented local path repository before Packagist registration. The Go submodule's version tags use the `go/vX.Y.Z` convention when publishing versioned releases.
 

@@ -20,9 +20,11 @@ type Identity struct {
 	Provider  string `json:"provider"`
 }
 
+// DNS lengths are checked after removing one root dot; native IDNA tables differ
+// in whether VerifyDNSLength permits that root dot.
 var domainProfile = idna.New(idna.MapForLookup(), idna.Transitional(false),
 	idna.StrictDomainName(true), idna.ValidateLabels(true), idna.CheckHyphens(false),
-	idna.CheckJoiners(true), idna.BidiRule(), idna.VerifyDNSLength(true))
+	idna.CheckJoiners(true), idna.BidiRule(), idna.VerifyDNSLength(false))
 
 func ascii(s string) bool {
 	for i := 0; i < len(s); i++ {

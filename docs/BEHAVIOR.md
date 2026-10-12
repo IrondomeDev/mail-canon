@@ -80,6 +80,12 @@ Python's library rejects some labels that a UTS #46-only implementation can map,
 
 The ports consequently do **not** claim exhaustive equality of Unicode-domain acceptance. Shared ASCII behavior and common internationalized examples have explicit vectors; they are not a proof over all Unicode. Cross-language identity systems must persist one authoritative canonical value or restrict accepted domains to an explicitly tested profile, and rerun the full corpus after dependency upgrades. Do not independently recompute identity keys in different languages, even with strict parsing. Keep the original addresses, verify ownership, and use an explicit migration when changing a runtime or dependency. For example, capital sharp S (U+1E9E in a domain) and reserved-hyphen Unicode domains can differ between native backends; the shared corpus is not a frozen Unicode profile.
 
+## Dependency security floors
+
+Go uses `golang.org/x/net v0.57.0` or newer. The [Go advisory](https://pkg.go.dev/vuln/GO-2026-5026) identifies v0.55.0 as fixed, but that version's ASCII-only Punycode rejection is conditional on newer Unicode tables. [Version v0.57.0](https://github.com/golang/net/blob/v0.57.0/idna/idna.go) rejects it unconditionally, including on Go 1.25/1.26. Shared tests reject `xn--gmail-.com` both directly and with a soft hyphen forcing the Unicode path. Go validates DNS lengths itself after removing one optional root dot to keep that behavior stable across native table versions.
+
+Python requires `idna>=3.15,<4` for the [upstream input-processing fix](https://github.com/kjd/idna/security/advisories/GHSA-65pc-fj4g-8rjx). The package's own 512-byte raw-input bound remains enforced before IDNA processing.
+
 ## Deliberate exclusions
 
 There is no SMTP or DNS verification, disposable-domain classification, ownership verification, account-alias lookup, free-provider discovery, or network request. Quoted local parts, comments, multiple recipients, IP literals, internationalized local parts, and other RFC-valid forms outside the stated grammar are rejected. Do not replace a full RFC parser or a verification flow with this package.

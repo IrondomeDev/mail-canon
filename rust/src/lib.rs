@@ -52,7 +52,7 @@ fn ascii_trim(s: &str) -> &str {
     s.trim_matches(|c| matches!(c, '\t' | '\n' | '\x0c' | '\r' | ' '))
 }
 
-/// Write domain followed by canonical address. ASCII inputs allocate no heap memory.
+/// Write domain followed by canonical address. Ordinary ASCII without Punycode allocates no heap memory.
 /// On error, the output buffer is unchanged.
 pub fn normalize_into(email: &str, output: &mut [u8]) -> Result<EmailParts, Error> {
     parse_into(email, output, false)

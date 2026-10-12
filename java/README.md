@@ -39,7 +39,7 @@ try {
 }
 ```
 
-Normalization uses locale-independent ASCII rules. IDNA initialization is deferred to Unicode-domain conversion. The result is a Java record; no service client or dependency injection container is required.
+Normalization uses locale-independent ASCII rules. IDNA initialization is deferred to Unicode domains and ASCII Punycode labels. The result is a Java record; no service client or dependency injection container is required.
 
 
 ## Address fields and display imports
