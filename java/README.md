@@ -8,13 +8,9 @@ Java 17+ and Maven; ICU4J supplies nontransitional domain conversion.
 
 ## Install and use
 
-From this repository's `java/` directory:
+Version `0.1.0` has passed Maven Central validation and is publishing. Installation becomes available when Central finishes distributing the artifacts.
 
-```sh
-mvn --batch-mode clean install
-```
-
-This installs the unreleased artifact in your local Maven repository. Add it to your application:
+Add the [Maven Central package](https://central.sonatype.com/artifact/dev.irondome/mail-canon) to your application:
 
 ```xml
 <dependency>
@@ -57,4 +53,4 @@ mvn --batch-mode package
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+Licensed under [MIT](LICENSE).

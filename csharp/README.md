@@ -8,10 +8,12 @@ Normalize email addresses and derive a provider-aware matching key locally. No n
 
 ## Install and use
 
-Reference this source project from your application:
+Version `0.1.0` has been uploaded through trusted publishing. Installation becomes available when NuGet finishes validation and indexing.
+
+Install the [NuGet package](https://www.nuget.org/packages/mail-canon):
 
 ```sh
-dotnet add reference /path/to/mail-canon/csharp/src/MailCanon.csproj
+dotnet add package mail-canon --version 0.1.0
 ```
 
 ```csharp
@@ -28,7 +30,7 @@ if (EmailNormalizer.TryNormalize("not-an-address", out var identity))
 }
 ```
 
-For local NuGet packaging, run `dotnet pack src/MailCanon.csproj -c Release -o artifacts` from `csharp/`. No package has been published by this source change.
+For local NuGet packaging, run `dotnet pack src/MailCanon.csproj -c Release -o artifacts` from `csharp/`.
 
 The parser uses bounded stack spans for cleanup and ASCII validation. Returned strings are owned. Domain conversion uses the runtime's `IdnMapping`, which can differ between ICU and Windows NLS environments.
 
@@ -48,4 +50,4 @@ dotnet pack src/MailCanon.csproj -c Release -o artifacts
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+Licensed under [MIT](LICENSE).

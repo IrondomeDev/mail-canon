@@ -45,8 +45,8 @@ Package releases are independent:
 | Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.0) | Released: `v0.1.0` |
 | Python | PyPI | Pending organization approval; install from source |
 | PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.0` |
-| Java | Maven Central | Source only; namespace, signing, and deployment setup needed |
-| C# | NuGet | Source only; registry credentials needed |
+| Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | `0.1.0` validated; registry publishing in progress |
+| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | `0.1.0` uploaded through trusted publishing; registry processing in progress |
 
 See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
