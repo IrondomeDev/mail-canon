@@ -4,7 +4,7 @@ import {createRequire} from 'node:module';
 import test from 'node:test';
 import {InvalidEmail, normalize, canonicalize, normalizeStrict, canonicalizeStrict} from '../index.js';
 
-for (const row of readFileSync(new URL('../../testdata/strict-vectors.tsv', import.meta.url), 'utf8').trimEnd().split('\n')) {
+for (const row of readFileSync(new URL('../../testdata/strict-vectors.tsv', import.meta.url), 'utf8').trimEnd().split(/\r?\n/)) {
   if (row.startsWith('#')) continue;
   const [name, encoded, domain, canonical, provider] = row.split('\t');
   test(`strict: ${name}`, () => {
@@ -20,7 +20,7 @@ for (const row of readFileSync(new URL('../../testdata/strict-vectors.tsv', impo
   });
 }
 
-const rows = readFileSync(new URL('../../testdata/vectors.tsv', import.meta.url), 'utf8').trimEnd().split('\n');
+const rows = readFileSync(new URL('../../testdata/vectors.tsv', import.meta.url), 'utf8').trimEnd().split(/\r?\n/);
 for (const row of rows) {
   if (row.startsWith('#')) continue;
   const [name, encoded, domain, canonical, provider] = row.split('\t');

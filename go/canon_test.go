@@ -25,7 +25,7 @@ func testVectors(t *testing.T, file string, normalize func(string) (Identity, er
 		if strings.HasPrefix(row, "#") {
 			continue
 		}
-		fields := strings.Split(row, "\t")
+		fields := strings.Split(strings.TrimSuffix(row, "\r"), "\t")
 		t.Run(fields[0], func(t *testing.T) {
 			t.Parallel()
 			bytes, err := hex.DecodeString(fields[1])
