@@ -49,6 +49,8 @@ Package releases are independent:
 
 See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
+The unscoped npm package `mail-canon` is managed through the [irondome-dev organization](https://www.npmjs.com/org/irondome-dev)'s developers team.
+
 ## Quick start
 
 Python is available from the checkout while PyPI approval is pending:

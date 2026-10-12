@@ -25,7 +25,7 @@ The MIT license is included at the root and in every package. Source review prec
 Existing CI only builds and tests; it does not publish artifacts. Publish from the relevant package directory after the tagged commit passes CI:
 
 - Rust: `cargo publish` with a crates.io account and publishing token configured using `cargo login`.
-- JavaScript: `npm publish --access public` after `npm login`. The unscoped package name is `mail-canon`; npm ownership belongs to the publishing account. The existing SDK remains under `@irondome-dev`. Complete any requested browser/2FA approval.
+- JavaScript: `npm publish --access public` after `npm login`. The unscoped package name is `mail-canon`, managed through the `irondome-dev:developers` organization team with read/write access. The existing SDK remains under `@irondome-dev`. Complete any requested browser/2FA approval. Verify organization access with `npm access list packages irondome-dev:developers --json`; publishing still authenticates an individual maintainer.
 - Go: push `go/vX.Y.Z` to the public repository, then resolve `github.com/IrondomeDev/mail-canon/go@vX.Y.Z` through the public Go proxy. No separate registry account is needed.
 - Python: publication is on hold pending PyPI organization approval.
 - PHP: submit the public PHP distribution mirror to [Packagist](https://packagist.org/about) using an authorized maintainer account. Composer is the package manager.
