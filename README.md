@@ -42,13 +42,13 @@ Package releases are independent:
 
 | Language | Registry | Status |
 | --- | --- | --- |
-| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | Released: `0.1.0` |
-| Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.0` |
-| Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.0) | Released: `v0.1.0` |
+| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | `0.1.0` released; `0.1.1` processing |
+| Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.1` |
+| Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.1) | Released: `v0.1.1` |
 | Python | PyPI | Pending organization approval; install from source |
-| PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.0` |
-| Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | `0.1.0` validated; registry publishing in progress |
-| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | `0.1.0` uploaded through trusted publishing; registry processing in progress |
+| PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.1` |
+| Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | `0.1.0` released; `0.1.1` publishing |
+| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | `0.1.0` released; `0.1.1` processing |
 
 See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
