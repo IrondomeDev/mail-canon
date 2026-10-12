@@ -11,7 +11,8 @@ function check(bool $condition, string $name): void {
     if (!$condition) { throw new RuntimeException($name); }
 }
 $count = 0;
-foreach (file(__DIR__ . '/../../testdata/vectors.tsv', FILE_IGNORE_NEW_LINES) as $row) {
+$testdata = is_dir(__DIR__ . '/../testdata') ? __DIR__ . '/../testdata' : __DIR__ . '/../../testdata';
+foreach (file($testdata . '/vectors.tsv', FILE_IGNORE_NEW_LINES) as $row) {
     if (str_starts_with($row, '#')) { continue; }
     [$name, $encoded, $domain, $canonical, $provider] = explode("\t", $row);
     $raw = hex2bin($encoded);
@@ -34,7 +35,7 @@ foreach ([null, 1, true, [], new stdClass()] as $value) {
         catch (TypeError) { }
     }
 }
-foreach (file(__DIR__ . '/../../testdata/strict-vectors.tsv', FILE_IGNORE_NEW_LINES) as $row) {
+foreach (file($testdata . '/strict-vectors.tsv', FILE_IGNORE_NEW_LINES) as $row) {
     if (str_starts_with($row, '#')) { continue; }
     [$name, $encoded, $domain, $canonical, $provider] = explode("\t", $row);
     $raw = hex2bin($encoded);

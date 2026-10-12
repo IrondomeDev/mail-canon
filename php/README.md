@@ -17,7 +17,7 @@ Use a Composer path repository in your application before a registry release exi
 }
 ```
 
-A future Packagist release needs a repository or distribution rooted at `php/`; the monorepo root is not a Composer package. The path repository above is usable without publishing.
+The [PHP distribution repository](https://github.com/IrondomeDev/mail-canon-php) provides a root-level `composer.json` for Packagist. It is generated from this monorepo; submit changes to the development repository. Until the package is registered on Packagist, use the path repository above.
 
 Run `composer install`, then:
 
@@ -50,7 +50,7 @@ Use `normalizeStrict` / `canonicalizeStrict` for untrusted address fields. It re
 
 ## Validate and measure
 
-Run from the `php/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
+Run from the monorepo's `php/` directory or the distribution repository root. The distribution includes copies of both shared test corpora.
 
 ```sh
 composer install
@@ -60,4 +60,4 @@ find src tests -name '*.php' -exec php -l {} \;
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+The Composer package name is `irondome/mail-canon`. Registry installation becomes available after Packagist registration. Licensed under [MIT](LICENSE).

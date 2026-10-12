@@ -43,7 +43,7 @@ Package releases are independent:
 | Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.0` |
 | Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.0) | Released: `v0.1.0` |
 | Python | PyPI | Pending organization approval; install from source |
-| PHP | Composer / Packagist | Source only; distribution mirror and registry setup needed |
+| PHP | Composer / Packagist | [Distribution mirror](https://github.com/IrondomeDev/mail-canon-php); awaiting Packagist registration |
 | Java | Maven Central | Source only; namespace, signing, and deployment setup needed |
 | C# | NuGet | Source only; registry credentials needed |
 

@@ -5,6 +5,17 @@
   <name>mail-canon</name><description>Bounded, provider-aware email normalization</description>
   <url>https://github.com/IrondomeDev/mail-canon</url>
   <licenses><license><name>MIT License</name><url>https://opensource.org/license/mit</url></license></licenses>
+  <developers>
+    <developer>
+      <id>irondome</id><name>IronDome</name><url>https://github.com/IrondomeDev</url>
+      <organization>IronDome</organization><organizationUrl>https://irondome.dev</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/IrondomeDev/mail-canon.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/IrondomeDev/mail-canon.git</developerConnection>
+    <url>https://github.com/IrondomeDev/mail-canon/tree/main/java</url>
+  </scm>
   <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
   <dependencies>
     <dependency><groupId>com.ibm.icu</groupId><artifactId>icu4j</artifactId><version>77.1</version></dependency>
@@ -13,5 +24,33 @@
   <build><resources><resource><directory>.</directory><targetPath>META-INF</targetPath><includes><include>README.md</include><include>API.md</include><include>LICENSE</include></includes></resource></resources><plugins>
     <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.0</version></plugin>
     <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.3</version></plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.3.1</version>
+      <executions><execution><id>sources</id><goals><goal>jar-no-fork</goal></goals></execution></executions>
+    </plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId><artifactId>maven-javadoc-plugin</artifactId><version>3.11.3</version>
+      <executions><execution><id>javadoc</id><goals><goal>jar</goal></goals></execution></executions>
+    </plugin>
   </plugins></build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build><plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+          <configuration><bestPractices>true</bestPractices></configuration>
+          <executions><execution><id>sign</id><phase>verify</phase><goals><goal>sign</goal></goals></execution></executions>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.11.0</version>
+          <extensions>true</extensions>
+          <configuration>
+            <publishingServerId>central</publishingServerId>
+            <autoPublish>true</autoPublish><waitUntil>published</waitUntil>
+          </configuration>
+        </plugin>
+      </plugins></build>
+    </profile>
+  </profiles>
 </project>

@@ -136,9 +136,14 @@ jobs:
           extensions: intl
           coverage: none
           tools: composer:v2
+      - name: Export Composer distribution
+        working-directory: .
+        run: python tools/export_php.py --output "$RUNNER_TEMP/mail-canon-php"
+      - run: composer validate --strict --working-dir="$RUNNER_TEMP/mail-canon-php"
       - run: composer validate --strict
       - run: composer install --no-interaction --no-progress --no-plugins --no-scripts
       - run: composer test
+      - run: composer test --working-dir="$RUNNER_TEMP/mail-canon-php"
       - run: find src tests -name '*.php' -exec php -l {} \;
 
   csharp:
