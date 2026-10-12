@@ -4,7 +4,7 @@ import com.ibm.icu.text.IDNA;
 import java.util.Locale;
 import java.util.Objects;
 
-/** Bounded, provider-aware email normalization. */
+/** A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team. */
 public final class MailCanon {
     private static final class DomainIdna {
         private static final IDNA INSTANCE = IDNA.getUTS46Instance(IDNA.USE_STD3_RULES

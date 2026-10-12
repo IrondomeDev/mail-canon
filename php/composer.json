@@ -1,6 +1,6 @@
 {
   "name": "irondome/mail-canon",
-  "description": "Bounded, provider-aware email normalization",
+  "description": "A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.",
   "type": "library",
   "license": "MIT",
   "homepage": "https://github.com/IrondomeDev/mail-canon",

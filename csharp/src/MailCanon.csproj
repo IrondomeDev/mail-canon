@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
-    <PackageId>mail-canon</PackageId><Version>0.1.0</Version>
-    <Description>Bounded, provider-aware email normalization</Description>
+    <PackageId>mail-canon</PackageId><Version>0.1.1</Version>
+    <Description>A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.</Description>
     <Authors>Iron Dome</Authors><PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/IrondomeDev/mail-canon</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

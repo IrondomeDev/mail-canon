@@ -1,6 +1,8 @@
 # mail-canon for Go
 
-Normalize email addresses and derive a provider-aware matching key locally. No network access, service client, telemetry, or mailbox lookup.
+A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.
+
+No network access, telemetry, or mailbox lookup.
 
 ## Requirements
 
@@ -11,7 +13,7 @@ Go 1.25+ and `golang.org/x/net/idna`.
 In an existing application module:
 
 ```sh
-go get github.com/IrondomeDev/mail-canon/go@v0.1.0
+go get github.com/IrondomeDev/mail-canon/go@v0.1.1
 ```
 
 ```go

@@ -9,7 +9,9 @@
 [![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
 [![CI](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
 
-**Provider-aware email normalization in seven languages.**
+**A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.**
+
+Available in Python, Rust, JavaScript, Java, Go, PHP, and C#.
 
 [Package guides](#packages) · [Behavior contract](docs/BEHAVIOR.md) · [Contributing](CONTRIBUTING.md) · [Release guide](RELEASING.md) · [IronDome](https://irondome.dev)
 

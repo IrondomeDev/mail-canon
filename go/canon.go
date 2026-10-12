@@ -1,4 +1,5 @@
-// Package mailcanon provides bounded, provider-aware email normalization.
+// Package mailcanon normalizes and canonicalises email addresses across Gmail,
+// Outlook, Yahoo, and more, by the irondome.dev team.
 package mailcanon
 
 import (

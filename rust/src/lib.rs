@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! Bounded, provider-aware email normalization.
+//! A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.
 
 use idna::uts46::{AsciiDenyList, DnsLength, Hyphens, Uts46};
 use std::{borrow::Cow, fmt};

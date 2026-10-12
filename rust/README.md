@@ -1,6 +1,8 @@
 # mail-canon for Rust
 
-Normalize email addresses and derive a provider-aware matching key locally. No network access, service client, telemetry, or mailbox lookup.
+A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.
+
+No network access, telemetry, or mailbox lookup.
 
 ## Requirements
 
@@ -12,7 +14,7 @@ Add the package to your application's `Cargo.toml`:
 
 ```toml
 [dependencies]
-mail-canon = "0.1.0"
+mail-canon = "0.1.1"
 ```
 
 ```rust

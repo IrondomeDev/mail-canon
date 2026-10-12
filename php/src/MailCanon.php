@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace IronDome\MailCanon;
 
-/** Bounded, provider-aware email normalization. */
+/** A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team. */
 final class MailCanon
 {
     private const SPACE = " \t\n\r\x0c";

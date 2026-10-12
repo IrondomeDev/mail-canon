@@ -10,7 +10,7 @@ public sealed class InvalidEmailException : FormatException
     public InvalidEmailException() : base("invalid email") { }
 }
 
-/// <summary>Bounded, provider-aware email normalization.</summary>
+/// <summary>A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.</summary>
 public static class EmailNormalizer
 {
     private static readonly IdnMapping Idn = new() { UseStd3AsciiRules = true, AllowUnassigned = false };

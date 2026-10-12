@@ -1,4 +1,4 @@
-"""Bounded, provider-aware email normalization."""
+"""A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team."""
 
 from dataclasses import dataclass
 import re

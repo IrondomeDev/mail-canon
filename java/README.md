@@ -1,6 +1,8 @@
 # mail-canon for Java
 
-Normalize email addresses and derive a provider-aware matching key locally. No network access, service client, telemetry, or mailbox lookup.
+A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.
+
+No network access, telemetry, or mailbox lookup.
 
 ## Requirements
 
@@ -8,7 +10,6 @@ Java 17+ and Maven; ICU4J supplies nontransitional domain conversion.
 
 ## Install and use
 
-Version `0.1.0` has passed Maven Central validation and is publishing. Installation becomes available when Central finishes distributing the artifacts.
 
 Add the [Maven Central package](https://central.sonatype.com/artifact/dev.irondome/mail-canon) to your application:
 
@@ -16,7 +17,7 @@ Add the [Maven Central package](https://central.sonatype.com/artifact/dev.irondo
 <dependency>
   <groupId>dev.irondome</groupId>
   <artifactId>mail-canon</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 

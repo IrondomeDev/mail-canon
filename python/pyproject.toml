@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mail-canon"
 version = "0.1.0"
-description = "Bounded, provider-aware email normalization"
+description = "A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"

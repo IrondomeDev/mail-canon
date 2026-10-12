@@ -1,6 +1,8 @@
 # mail-canon for JavaScript
 
-Normalize email addresses and derive a provider-aware matching key locally. No network access, service client, telemetry, or mailbox lookup.
+A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team.
+
+No network access, telemetry, or mailbox lookup.
 
 ## Requirements
 
