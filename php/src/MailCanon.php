@@ -17,8 +17,21 @@ final class MailCanon
     /** Return the normalized input domain, canonical address, and provider. */
     public static function normalize(mixed $email): EmailIdentity
     {
+        return self::parse($email, false);
+    }
+
+    /** Normalize one bare address without wrappers, whitespace or cleanup. */
+    public static function normalizeStrict(mixed $email): EmailIdentity
+    {
+        return self::parse($email, true);
+    }
+
+    private static function parse(mixed $email, bool $strict): EmailIdentity
+    {
         if (!is_string($email)) { throw new \TypeError('email must be a string'); }
         if ($email === '' || strlen($email) > 512) { throw new InvalidEmail(); }
+        if (preg_match('//u', $email) !== 1 || preg_match('/[\x{0000}-\x{001f}\x{007f}-\x{009f}\x{2028}\x{2029}]/u', $email) === 1) { throw new InvalidEmail(); }
+        if ($strict && preg_match('/[\x{0020}\x{00a0}\x{1680}\x{2000}-\x{200d}\x{2024}\x{202f}\x{205f}\x{2060}\x{3000}\x{3002}\x{feff}\x{fe62}\x{ff0b}\x{ff0e}\x{ff20}\x{ff61}<>:?#]/u', $email) === 1) { throw new InvalidEmail(); }
         if (preg_match('/[\x80-\xff]/', $email) === 0) {
             $value = trim($email, " \t\n\r\x0b\x0c");
         } else {
@@ -34,8 +47,10 @@ final class MailCanon
         }
         $left = strpos($value, '<');
         $right = strrpos($value, '>');
-        if ($left !== false && $right !== false) {
-            if ($left >= $right) { throw new InvalidEmail(); }
+        if ($left !== false || $right !== false) {
+            if ($left === false || $right === false || $left >= $right || $right !== strlen($value) - 1
+                || strpbrk(substr($value, 0, $left), '@<>,;:') !== false
+                || strpbrk(substr($value, $left + 1, $right - $left - 1), '<>') !== false) { throw new InvalidEmail(); }
             $value = trim(substr($value, $left + 1, $right - $left - 1), self::SPACE);
         }
         $at = strpos($value, '@');
@@ -44,8 +59,8 @@ final class MailCanon
         $domain = trim(substr($value, $at + 1), self::SPACE);
         if ($local === '' || strlen($local) > 64 || $domain === '' || preg_match('/\A[A-Za-z0-9._%+\-]+\z/', $local) !== 1) { throw new InvalidEmail(); }
         if ($local[0] === '.' || str_ends_with($local, '.') || str_contains($local, '..')) { throw new InvalidEmail(); }
-        if (preg_match('/[^\x00-\x7f]/', $domain) === 1) {
-            if (!function_exists('idn_to_ascii')) { throw new \LogicException('mail-canon requires ext-intl for Unicode domains'); }
+        if (preg_match('/[^\x00-\x7f]/', $domain) === 1 || preg_match('/(?:\A|\.)xn--/i', $domain) === 1) {
+            if (!function_exists('idn_to_ascii')) { throw new \LogicException('mail-canon requires ext-intl for IDNA domains'); }
             $info = [];
             idn_to_ascii($domain, IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_USE_STD3_RULES | IDNA_CHECK_BIDI | IDNA_CHECK_CONTEXTJ, INTL_IDNA_VARIANT_UTS46, $info);
             if (!isset($info['result'], $info['errors']) || ($info['errors'] & ~IDNA_ERROR_HYPHEN_3_4) !== 0) { throw new InvalidEmail(); }
@@ -85,5 +100,11 @@ final class MailCanon
     public static function canonicalize(mixed $email): string
     {
         return self::normalize($email)->canonical;
+    }
+
+    /** Return a matching key with address-only validation. */
+    public static function canonicalizeStrict(mixed $email): string
+    {
+        return self::normalizeStrict($email)->canonical;
     }
 }

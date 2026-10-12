@@ -1,5 +1,7 @@
 module github.com/IrondomeDev/mail-canon/go
 
-go 1.23.0
+go 1.25.0
 
-require golang.org/x/net v0.43.0
+require golang.org/x/net v0.55.0
+
+require golang.org/x/text v0.37.0 // indirect

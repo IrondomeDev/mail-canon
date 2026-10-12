@@ -35,9 +35,13 @@ try {
 CommonJS uses `const {normalize} = require('@irondome/mail-canon')`. TypeScript declarations cover both import styles. `normalize` is synchronous. Browser applications need a bundler that resolves CommonJS and `tr46`; the ESM wrapper is not a standalone browser script. No Node-specific API is used in the parser.
 
 
+## Address fields and display imports
+
+Use `normalizeStrict` / `canonicalizeStrict` for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `javascript/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `javascript/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 npm install

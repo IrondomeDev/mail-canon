@@ -44,9 +44,11 @@ function byteLength(text) {
   return bytes;
 }
 
-function parse(raw, identity) {
+function parse(raw, identity, strict = false) {
   if (typeof raw !== 'string') throw new TypeError('email must be a string');
   if (!raw.length || raw.length > 512) throw new InvalidEmail();
+  if (/[\x00-\x1f\x7f-\x9f\u2028\u2029]/.test(raw)) throw new InvalidEmail();
+  if (strict && /[\u0020\u00a0\u1680\u2000-\u200d\u2024\u202f\u205f\u2060\u3000\u3002\ufeff\ufe62\uff0b\uff0e\uff20\uff61<>:?#]/.test(raw)) throw new InvalidEmail();
   const unicode = NON_ASCII.test(raw);
   if (unicode) byteLength(raw);
   let value = raw.replace(UNICODE_SPACE, '');
@@ -58,8 +60,9 @@ function parse(raw, identity) {
     value = value.slice(0, Math.min(q < 0 ? value.length : q, h < 0 ? value.length : h)).replace(ASCII_SPACE, '');
   }
   const left = value.indexOf('<'), right = value.lastIndexOf('>');
-  if (left >= 0 && right >= 0) {
-    if (left >= right) throw new InvalidEmail();
+  if (left >= 0 || right >= 0) {
+    if (left < 0 || right <= left || right !== value.length - 1 ||
+        /[@<>,;:]/.test(value.slice(0, left)) || /[<>]/.test(value.slice(left + 1, right))) throw new InvalidEmail();
     value = value.slice(left + 1, right).replace(ASCII_SPACE, '');
   }
   const at = value.indexOf('@');
@@ -69,7 +72,7 @@ function parse(raw, identity) {
   if (!local.length || local.length > 64 || /[^A-Za-z0-9._%+\-]/.test(local) ||
       local[0] === '.' || local.endsWith('.') || local.includes('..') || !domain) throw new InvalidEmail();
   if (domain.endsWith('.')) domain = domain.slice(0, -1);
-  if (NON_ASCII.test(domain)) {
+  if (NON_ASCII.test(domain) || /(?:^|\.)xn--/i.test(domain)) {
     idna ??= require('tr46');
     domain = idna.toASCII(domain, IDNA_OPTIONS);
     if (!domain) throw new InvalidEmail();
@@ -105,7 +108,13 @@ function parse(raw, identity) {
 function normalize(email) { return parse(email, true); }
 /** Return the canonical address, using the same validation as normalize. */
 function canonicalize(email) { return parse(email, false); }
+/** Normalize one bare address without wrappers, whitespace or cleanup. */
+function normalizeStrict(email) { return parse(email, true, true); }
+/** Return a matching key with address-only validation. */
+function canonicalizeStrict(email) { return parse(email, false, true); }
 
 exports.InvalidEmail = InvalidEmail;
 exports.normalize = normalize;
 exports.canonicalize = canonicalize;
+exports.normalizeStrict = normalizeStrict;
+exports.canonicalizeStrict = canonicalizeStrict;

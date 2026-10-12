@@ -33,9 +33,13 @@ For local NuGet packaging, run `dotnet pack src/MailCanon.csproj -c Release -o a
 The parser uses bounded stack spans for cleanup and ASCII validation. Returned strings are owned. Domain conversion uses the runtime's `IdnMapping`, which can differ between ICU and Windows NLS environments.
 
 
+## Address fields and display imports
+
+Use `NormalizeStrict` / `CanonicalizeStrict` (or `TryNormalizeStrict`) for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `csharp/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `csharp/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 dotnet run --project tests/MailCanon.Tests.csproj -c Release

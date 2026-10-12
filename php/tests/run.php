@@ -29,9 +29,25 @@ foreach (file(__DIR__ . '/../../testdata/vectors.tsv', FILE_IGNORE_NEW_LINES) as
     $count++;
 }
 foreach ([null, 1, true, [], new stdClass()] as $value) {
-    foreach (['normalize', 'canonicalize'] as $fn) {
+    foreach (['normalize', 'canonicalize', 'normalizeStrict', 'canonicalizeStrict'] as $fn) {
         try { MailCanon::$fn($value); throw new RuntimeException('accepted non-string'); }
         catch (TypeError) { }
+    }
+}
+foreach (file(__DIR__ . '/../../testdata/strict-vectors.tsv', FILE_IGNORE_NEW_LINES) as $row) {
+    if (str_starts_with($row, '#')) { continue; }
+    [$name, $encoded, $domain, $canonical, $provider] = explode("\t", $row);
+    $raw = hex2bin($encoded);
+    if ($domain === '-') {
+        foreach (['normalizeStrict', 'canonicalizeStrict'] as $fn) {
+            try { MailCanon::$fn($raw); throw new RuntimeException($name . ': strict accepted invalid input'); }
+            catch (InvalidEmail) { }
+        }
+    } else {
+        $value = MailCanon::normalizeStrict($raw);
+        check([$value->domain, $value->canonical, $value->provider] === [$domain, $canonical, $provider], $name);
+        check(MailCanon::canonicalizeStrict($raw) === $canonical, $name);
+        check(MailCanon::canonicalizeStrict($canonical) === $canonical, $name . ': strict not idempotent');
     }
 }
 foreach (["\xff@example.com", "name \xed\xa0\x80 <u@example.com>"] as $raw) {

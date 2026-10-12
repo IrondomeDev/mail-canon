@@ -4,7 +4,7 @@ Normalize email addresses and derive a provider-aware matching key locally. No n
 
 ## Requirements
 
-Go 1.23+ and `golang.org/x/net/idna`.
+Go 1.25+ and `golang.org/x/net/idna`.
 
 ## Install and use
 
@@ -38,9 +38,13 @@ func main() {
 The provider parser uses bounded buffers and an explicit domain-conversion profile. Public functions return owned strings, not slices into reused memory. The `go/` submodule is versioned separately with `go/vX.Y.Z` release tags.
 
 
+## Address fields and display imports
+
+Use `NormalizeStrict` / `CanonicalizeStrict` for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `go/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `go/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 go mod tidy

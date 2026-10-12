@@ -2,12 +2,29 @@ from pathlib import Path
 import random
 import unittest
 
-from mail_canon import InvalidEmail, canonicalize, normalize
+from mail_canon import InvalidEmail, canonicalize, normalize, canonicalize_strict, normalize_strict
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class CanonTests(unittest.TestCase):
+    def test_strict_vectors(self):
+        for row in (ROOT / "testdata/strict-vectors.tsv").read_text().splitlines():
+            if row.startswith("#"):
+                continue
+            name, encoded, domain, canonical, provider = row.split("\t")
+            raw = bytes.fromhex(encoded).decode()
+            with self.subTest(name=name):
+                if domain == "-":
+                    for function in (normalize_strict, canonicalize_strict):
+                        with self.assertRaises(InvalidEmail):
+                            function(raw)
+                else:
+                    result = normalize_strict(raw)
+                    self.assertEqual((result.domain, result.canonical, result.provider), (domain, canonical, provider))
+                    self.assertEqual(canonicalize_strict(raw), canonical)
+                    self.assertEqual(canonicalize_strict(canonical), canonical)
+
     def test_vectors(self):
         for row in (ROOT / "testdata/vectors.tsv").read_text().splitlines():
             if row.startswith("#"):
@@ -27,12 +44,13 @@ class CanonTests(unittest.TestCase):
 
     def test_types(self):
         for value in (None, 1, True, b"u@example.com", [], {}):
-            for function in (normalize, canonicalize):
+            for function in (normalize, canonicalize, normalize_strict, canonicalize_strict):
                 with self.assertRaises(TypeError):
                     function(value)
         for value in ("\ud800@example.com", "name \udfff <u@example.com>"):
-            with self.assertRaises(InvalidEmail):
-                normalize(value)
+            for function in (normalize, normalize_strict):
+                with self.assertRaises(InvalidEmail):
+                    function(value)
 
     def test_random_inputs_are_bounded_and_idempotent(self):
         randomizer = random.Random(82751)

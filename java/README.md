@@ -42,9 +42,13 @@ try {
 Normalization uses locale-independent ASCII rules. IDNA initialization is deferred to Unicode-domain conversion. The result is a Java record; no service client or dependency injection container is required.
 
 
+## Address fields and display imports
+
+Use `normalizeStrict` / `canonicalizeStrict` for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `java/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `java/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 mvn --batch-mode test

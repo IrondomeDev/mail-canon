@@ -7,3 +7,6 @@ export interface EmailIdentity {
 export class InvalidEmail extends Error {}
 export function normalize(email: string): EmailIdentity;
 export function canonicalize(email: string): string;
+/** Normalize one bare address; reject wrappers, whitespace and cleanup. */
+export function normalizeStrict(email: string): EmailIdentity;
+export function canonicalizeStrict(email: string): string;

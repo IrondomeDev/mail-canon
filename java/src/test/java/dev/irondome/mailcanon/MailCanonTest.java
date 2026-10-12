@@ -12,6 +12,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 final class MailCanonTest {
+    @TestFactory Stream<DynamicTest> strictVectors() throws Exception {
+        return Files.readAllLines(Path.of("..", "testdata", "strict-vectors.tsv")).stream()
+            .filter(row -> !row.startsWith("#")).map(row -> {
+                String[] v = row.split("\t", -1);
+                return DynamicTest.dynamicTest("strict: " + v[0], () -> {
+                    String raw = new String(HexFormat.of().parseHex(v[1]), StandardCharsets.UTF_8);
+                    if (v[2].equals("-")) {
+                        assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.normalizeStrict(raw));
+                        assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.canonicalizeStrict(raw));
+                    } else {
+                        assertEquals(new MailCanon.Identity(v[2], v[3], v[4]), MailCanon.normalizeStrict(raw));
+                        assertEquals(v[3], MailCanon.canonicalizeStrict(raw));
+                        assertEquals(v[3], MailCanon.canonicalizeStrict(v[3]));
+                    }
+                });
+            });
+    }
+
     @TestFactory Stream<DynamicTest> vectors() throws Exception {
         return Files.readAllLines(Path.of("..", "testdata", "vectors.tsv")).stream()
             .filter(row -> !row.startsWith("#")).map(row -> {
@@ -33,6 +51,8 @@ final class MailCanonTest {
     @Test void nullAndInvalidUtf16() {
         assertThrows(NullPointerException.class, () -> MailCanon.normalize(null));
         assertThrows(NullPointerException.class, () -> MailCanon.canonicalize(null));
+        assertThrows(NullPointerException.class, () -> MailCanon.normalizeStrict(null));
+        assertThrows(NullPointerException.class, () -> MailCanon.canonicalizeStrict(null));
         for (String raw : new String[]{"\ud800@example.com", "name \udfff <u@example.com>"})
             assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.normalize(raw));
     }

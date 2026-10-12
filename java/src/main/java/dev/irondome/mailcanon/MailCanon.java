@@ -82,8 +82,22 @@ public final class MailCanon {
 
     /** Return the normalized input domain, canonical address, and provider. */
     public static Identity normalize(String email) {
+        return normalize(email, false);
+    }
+
+    /** Normalize one bare address without wrappers, whitespace or cleanup. */
+    public static Identity normalizeStrict(String email) {
+        return normalize(email, true);
+    }
+
+    private static Identity normalize(String email, boolean strict) {
         Objects.requireNonNull(email, "email");
         checkLength(email);
+        for (int i = 0; i < email.length(); i++) {
+            char c = email.charAt(i);
+            if (c < 32 || c >= 127 && c <= 159 || c == '\u2028' || c == '\u2029') throw invalid();
+            if (strict && (unicodeSpace(c) || "<>:?#\u200b\u200c\u200d\ufeff\u2060\uff0e\u3002\uff61\u2024\uff0b\ufe62\uff20".indexOf(c) >= 0)) throw invalid();
+        }
         String value = clean(email);
         if (value.length() >= 7 && value.substring(0, 7).toLowerCase(Locale.ROOT).equals("mailto:")) {
             value = trim(value.substring(7), false);
@@ -92,8 +106,11 @@ public final class MailCanon {
             value = trim(value.substring(0, end), false);
         }
         int left = value.indexOf('<'), right = value.lastIndexOf('>');
-        if (left >= 0 && right >= 0) {
-            if (left >= right) throw invalid();
+        if (left >= 0 || right >= 0) {
+            if (left < 0 || right <= left || right != value.length() - 1
+                || value.substring(0, left).chars().anyMatch(c -> "@<>,;:".indexOf(c) >= 0)
+                || value.substring(left + 1, right).indexOf('<') >= 0
+                || value.substring(left + 1, right).indexOf('>') >= 0) throw invalid();
             value = trim(value.substring(left + 1, right), false);
         }
         int at = value.indexOf('@');
@@ -109,7 +126,8 @@ public final class MailCanon {
             if (c == '.' && (i == 0 || i == local.length() - 1 || local.charAt(i - 1) == '.')) throw invalid();
             buffer[i] = c;
         }
-        if (!ascii(domain)) {
+        String lowerDomain = domain.toLowerCase(Locale.ROOT);
+        if (!ascii(domain) || lowerDomain.startsWith("xn--") || lowerDomain.contains(".xn--")) {
             IDNA.Info info = new IDNA.Info();
             StringBuilder result = new StringBuilder(domain.length());
             DomainIdna.INSTANCE.nameToASCII(domain, result, info);
@@ -161,4 +179,7 @@ public final class MailCanon {
 
     /** Return only the canonical address with normalize's validation. */
     public static String canonicalize(String email) { return normalize(email).canonical(); }
+
+    /** Return a matching key with address-only validation. */
+    public static String canonicalizeStrict(String email) { return normalizeStrict(email).canonical(); }
 }

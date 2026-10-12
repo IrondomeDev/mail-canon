@@ -8,7 +8,16 @@ import (
 )
 
 func TestVectors(t *testing.T) {
-	content, err := os.ReadFile("../testdata/vectors.tsv")
+	testVectors(t, "vectors.tsv", Normalize, Canonicalize)
+}
+
+func TestStrictVectors(t *testing.T) {
+	testVectors(t, "strict-vectors.tsv", NormalizeStrict, CanonicalizeStrict)
+}
+
+func testVectors(t *testing.T, file string, normalize func(string) (Identity, error), canonicalize func(string) (string, error)) {
+	t.Helper()
+	content, err := os.ReadFile("../testdata/" + file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,12 +33,12 @@ func TestVectors(t *testing.T) {
 				t.Fatal(err)
 			}
 			raw := string(bytes)
-			value, err := Normalize(raw)
+			value, err := normalize(raw)
 			if fields[2] == "-" {
 				if err != ErrInvalidEmail {
 					t.Fatalf("expected ErrInvalidEmail, got %v", err)
 				}
-				if _, err := Canonicalize(raw); err != ErrInvalidEmail {
+				if _, err := canonicalize(raw); err != ErrInvalidEmail {
 					t.Fatal(err)
 				}
 				return
@@ -41,10 +50,10 @@ func TestVectors(t *testing.T) {
 			if value != expected {
 				t.Fatalf("got %#v, want %#v", value, expected)
 			}
-			if s, err := Canonicalize(raw); err != nil || s != value.Canonical {
+			if s, err := canonicalize(raw); err != nil || s != value.Canonical {
 				t.Fatalf("canonical: %q %v", s, err)
 			}
-			if s, err := Canonicalize(value.Canonical); err != nil || s != value.Canonical {
+			if s, err := canonicalize(value.Canonical); err != nil || s != value.Canonical {
 				t.Fatalf("not idempotent: %q %v", s, err)
 			}
 		})
@@ -55,6 +64,9 @@ func TestInvalidUTF8(t *testing.T) {
 	for _, raw := range []string{"\xff@example.com", "name \xed\xa0\x80 <u@example.com>"} {
 		if _, err := Normalize(raw); err != ErrInvalidEmail {
 			t.Fatalf("got %v", err)
+		}
+		if _, err := NormalizeStrict(raw); err != ErrInvalidEmail {
+			t.Fatalf("strict: got %v", err)
 		}
 	}
 }

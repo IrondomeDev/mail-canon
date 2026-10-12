@@ -6,13 +6,17 @@ The public operations normalize one supported address or reject it. All successf
 
 A string must be nonempty and at most **512 UTF-8 bytes before cleanup**. Malformed Unicode is rejected. Statically typed APIs accept their language's string type; dynamic APIs reject non-string values without coercion. Null behavior is documented per package.
 
-The exact cleanup sequence is:
+Every API rejects C0 controls (U+0000 through U+001F), C1 controls (U+007F through U+009F), and Unicode line/paragraph separators (U+2028/U+2029) anywhere in the original input, including display names and discarded URI suffixes, before any cleanup.
 
-1. Trim outer Unicode White_Space: U+0009 through U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 through U+200A, U+2028, U+2029, U+202F, U+205F, and U+3000.
+Strict address-only APIs also reject all Unicode White_Space, characters in the explicit cleanup table below, and `<`, `>`, `:`, `?`, and `#`. They accept exactly one bare supported address. Case/provider transformations, trailing root-dot handling, and native IDNA domain mapping still apply; this is syntax validation, not proof of ownership or a frozen Unicode identity profile.
+
+The display-import APIs (`normalize` / `canonicalize` and language equivalents) apply this cleanup sequence after rejecting controls:
+
+1. Trim outer non-control Unicode White_Space: U+0020, U+00A0, U+1680, U+2000 through U+200A, U+202F, U+205F, and U+3000.
 2. Remove U+200B, U+200C, U+200D, U+FEFF, and U+2060 anywhere. Map U+FF0E, U+3002, U+FF61, and U+2024 to `.`; U+FF0B and U+FE62 to `+`; U+FF20 to `@`.
 3. Trim ASCII space, tab, line feed, form feed, and carriage return. This inner trim does not include vertical tab or NUL.
 4. Remove an ASCII-case-insensitive `mailto:` prefix when present. Trim the remainder, discard everything from its first `?` or `#`, then trim again. Percent escapes are not decoded.
-5. If both `<` and `>` exist, extract from the first `<` to the last `>`, reject reversed delimiters, and trim. Text outside the delimiters is ignored. This is not a general email-header parser.
+5. If either `<` or `>` exists, require exactly one balanced `<address>` wrapper. Its closing `>` must end the cleaned value. The display-name prefix cannot contain `@`, `<`, `>`, `,`, `;`, or `:`; the wrapped address cannot contain nested delimiters. Trim the enclosed address. No trailing text or extra recipient is ignored. This is not a general email-header parser.
 6. Require exactly one `@`. Trim the two sides using the ASCII rule above.
 
 Removing invisible characters is intentionally lossy. Preserve the original input for audit or display when that distinction matters.
@@ -27,11 +31,11 @@ After provider rewriting, an empty base or a base ending in `.` is rejected. For
 
 ## Domain
 
-An ASCII input domain uses a direct scan. A non-ASCII input domain is passed to the package's IDNA implementation. The intended mapping is nontransitional UTS #46 with STD3-style domain validation and bidirectional/contextual-joiner checks. See the interoperability limits below.
+An ordinary ASCII input domain uses a direct scan. Non-ASCII domains and ASCII domains containing an `xn--` label are passed to the package's IDNA implementation. The intended mapping is nontransitional UTS #46 with STD3-style domain validation and bidirectional/contextual-joiner checks. See the interoperability limits below.
 
 After conversion, one final root dot is removed. The domain is lowercased and must have at least two nonempty labels. Only ASCII letters, digits, and hyphens are accepted within labels. Each label is 1 through 63 bytes and cannot start or end with a hyphen. The full domain is at most 253 bytes.
 
-ASCII `xn--` labels are checked for this DNS shape, not decoded and revalidated. An ASCII address with a malformed punycode-looking label can therefore pass shape validation. This API does not establish that the domain exists or is registered.
+ASCII `xn--` labels must pass native IDNA validation, including decoding and revalidation; malformed A-labels are rejected. C# additionally checks that decoded labels contain non-ASCII characters and round-trip to their A-label because platform backends differ. This API does not establish that the domain exists or is registered. Ordinary ASCII DNS labels such as `ab--cd.test` retain their existing shape-validation policy.
 
 ## Provider policy
 
@@ -74,7 +78,7 @@ Internationalized domain conversion is delegated rather than implemented with a 
 
 Python's library rejects some labels that a UTS #46-only implementation can map, including some symbol or context-sensitive labels. Its third/fourth-position hyphen checks also differ on the Unicode path. .NET behavior depends on the operating system and whether ICU or NLS supplies globalization. The Unicode data version can differ between installed dependencies and runtimes.
 
-The ports consequently do **not** claim exhaustive equality of Unicode-domain acceptance. Shared ASCII behavior and common internationalized examples have explicit vectors; they are not a proof over all Unicode. Cross-language identity systems should persist one authoritative canonical value or restrict accepted domains to a tested profile, and rerun the full corpus after dependency upgrades. Do not silently recompute stored keys with an upgraded runtime.
+The ports consequently do **not** claim exhaustive equality of Unicode-domain acceptance. Shared ASCII behavior and common internationalized examples have explicit vectors; they are not a proof over all Unicode. Cross-language identity systems must persist one authoritative canonical value or restrict accepted domains to an explicitly tested profile, and rerun the full corpus after dependency upgrades. Do not independently recompute identity keys in different languages, even with strict parsing. Keep the original addresses, verify ownership, and use an explicit migration when changing a runtime or dependency. For example, capital sharp S (U+1E9E in a domain) and reserved-hyphen Unicode domains can differ between native backends; the shared corpus is not a frozen Unicode profile.
 
 ## Deliberate exclusions
 

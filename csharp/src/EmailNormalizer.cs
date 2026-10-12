@@ -68,9 +68,21 @@ public static class EmailNormalizer
 
     /// <summary>Return the normalized input domain, canonical address, and provider.</summary>
     public static EmailIdentity Normalize(string email)
+        => Normalize(email, false);
+
+    /// <summary>Normalize one bare address without wrappers, whitespace or cleanup.</summary>
+    public static EmailIdentity NormalizeStrict(string email)
+        => Normalize(email, true);
+
+    private static EmailIdentity Normalize(string email, bool strict)
     {
         ArgumentNullException.ThrowIfNull(email);
         CheckLength(email);
+        foreach (char c in email)
+        {
+            if (c < 32 || c is >= '\u007f' and <= '\u009f' or '\u2028' or '\u2029') throw new InvalidEmailException();
+            if (strict && (UnicodeSpace(c) || "<>:?#\u200b\u200c\u200d\ufeff\u2060\uff0e\u3002\uff61\u2024\uff0b\ufe62\uff20".Contains(c))) throw new InvalidEmailException();
+        }
         ReadOnlySpan<char> value = Trim(email.AsSpan(), true);
         Span<char> cleaned = stackalloc char[512];
         int used = 0;
@@ -97,9 +109,11 @@ public static class EmailNormalizer
             if (end >= 0) value = Trim(value[..end]);
         }
         int left = value.IndexOf('<'), right = value.LastIndexOf('>');
-        if (left >= 0 && right >= 0)
+        if (left >= 0 || right >= 0)
         {
-            if (left >= right) throw new InvalidEmailException();
+            if (left < 0 || right <= left || right != value.Length - 1
+                || value[..left].IndexOfAny("@<>,;:".AsSpan()) >= 0
+                || value[(left + 1)..right].IndexOfAny('<', '>') >= 0) throw new InvalidEmailException();
             value = Trim(value[(left + 1)..right]);
         }
         int at = value.IndexOf('@');
@@ -118,7 +132,9 @@ public static class EmailNormalizer
         }
         bool unicodeDomain = false;
         foreach (char c in domain) unicodeDomain |= c > 127;
-        if (unicodeDomain)
+        bool aceDomain = domain.StartsWith("xn--", StringComparison.OrdinalIgnoreCase)
+            || domain.Contains(".xn--", StringComparison.OrdinalIgnoreCase);
+        if (unicodeDomain || aceDomain)
         {
             for (int offset = 0; offset < domain.Length;)
             {
@@ -134,7 +150,18 @@ public static class EmailNormalizer
                 if (dot < 0) break;
                 offset += dot + 1;
             }
-            try { domain = Idn.GetAscii(domain.ToString()).AsSpan(); }
+            try
+            {
+                string converted = Idn.GetAscii(domain.ToString());
+                // Some platform backends leave invalid ASCII A-labels unchanged.
+                foreach (string label in converted.Split('.'))
+                {
+                    if (!label.StartsWith("xn--", StringComparison.OrdinalIgnoreCase)) continue;
+                    string decoded = Idn.GetUnicode(label);
+                    if (decoded.All(c => c < 128) || !Idn.GetAscii(decoded).Equals(label, StringComparison.OrdinalIgnoreCase)) throw new InvalidEmailException();
+                }
+                domain = converted.AsSpan();
+            }
             catch (ArgumentException) { throw new InvalidEmailException(); }
         }
         if (!domain.IsEmpty && domain[^1] == '.') domain = domain[..^1];
@@ -190,6 +217,18 @@ public static class EmailNormalizer
 
     /// <summary>Return only the canonical address with Normalize's validation.</summary>
     public static string Canonicalize(string email) => Normalize(email).Canonical;
+
+    /// <summary>Return a matching key with address-only validation.</summary>
+    public static string CanonicalizeStrict(string email) => NormalizeStrict(email).Canonical;
+
+    /// <summary>Return false for null or invalid bare-address input.</summary>
+    public static bool TryNormalizeStrict(string? email, out EmailIdentity identity)
+    {
+        identity = default;
+        if (email is null) return false;
+        try { identity = NormalizeStrict(email); return true; }
+        catch (InvalidEmailException) { return false; }
+    }
 
     /// <summary>Return false for null or invalid input; otherwise return the identity.</summary>
     public static bool TryNormalize(string? email, out EmailIdentity identity)

@@ -55,8 +55,26 @@ fn ascii_trim(s: &str) -> &str {
 /// Write domain followed by canonical address. ASCII inputs allocate no heap memory.
 /// On error, the output buffer is unchanged.
 pub fn normalize_into(email: &str, output: &mut [u8]) -> Result<EmailParts, Error> {
+    parse_into(email, output, false)
+}
+
+/// Write a bare address without wrappers, whitespace or cleanup.
+/// On error, the output buffer is unchanged.
+pub fn normalize_strict_into(email: &str, output: &mut [u8]) -> Result<EmailParts, Error> {
+    parse_into(email, output, true)
+}
+
+fn parse_into(email: &str, output: &mut [u8], strict: bool) -> Result<EmailParts, Error> {
     use Error::InvalidEmail as Invalid;
     if email.is_empty() || email.len() > MAX_INPUT_BYTES { return Err(Invalid); }
+    for c in email.chars() {
+        if c <= '\u{1f}' || ('\u{7f}'..='\u{9f}').contains(&c) || matches!(c, '\u{2028}' | '\u{2029}') {
+            return Err(Invalid);
+        }
+        if strict && (c.is_whitespace() || "<>:?#\u{200b}\u{200c}\u{200d}\u{feff}\u{2060}\u{ff0e}\u{3002}\u{ff61}\u{2024}\u{ff0b}\u{fe62}\u{ff20}".contains(c)) {
+            return Err(Invalid);
+        }
+    }
     let mut cleaned = [0u8; MAX_INPUT_BYTES];
     let trimmed = email.trim();
     let mut value = if trimmed.is_ascii() {
@@ -80,8 +98,10 @@ pub fn normalize_into(email: &str, output: &mut [u8]) -> Result<EmailParts, Erro
         value = ascii_trim(&value[7..]);
         if let Some(end) = value.find(['?', '#']) { value = ascii_trim(&value[..end]); }
     }
-    if let (Some(left), Some(right)) = (value.find('<'), value.rfind('>')) {
-        if left >= right { return Err(Invalid); }
+    if value.contains(['<', '>']) {
+        let (left, right) = (value.find('<').ok_or(Invalid)?, value.rfind('>').ok_or(Invalid)?);
+        if left >= right || right != value.len() - 1 || value[..left].contains(['@', '<', '>', ',', ';', ':'])
+            || value[left + 1..right].contains(['<', '>']) { return Err(Invalid); }
         value = ascii_trim(&value[left + 1..right]);
     }
     let (local_raw, domain_raw) = value.split_once('@').ok_or(Invalid)?;
@@ -95,7 +115,8 @@ pub fn normalize_into(email: &str, output: &mut [u8]) -> Result<EmailParts, Erro
         local[i] = b.to_ascii_lowercase();
     }
     let raw_domain = ascii_trim(domain_raw);
-    let encoded: Cow<'_, str> = if raw_domain.is_ascii() {
+    let ace = raw_domain.split('.').any(|label| label.get(..4).is_some_and(|s| s.eq_ignore_ascii_case("xn--")));
+    let encoded: Cow<'_, str> = if raw_domain.is_ascii() && !ace {
         Cow::Borrowed(raw_domain)
     } else {
         Uts46::new().to_ascii(raw_domain.as_bytes(), AsciiDenyList::STD3,
@@ -167,6 +188,26 @@ pub fn normalize(email: &str) -> Result<EmailIdentity, Error> {
 pub fn canonicalize(email: &str) -> Result<String, Error> {
     let mut output = [0u8; OUTPUT_CAPACITY];
     let parts = normalize_into(email, &mut output)?;
+    let bytes = &output[parts.domain_len..parts.domain_len + parts.canonical_len];
+    Ok(std::str::from_utf8(bytes).map_err(|_| Error::InvalidEmail)?.to_owned())
+}
+
+/// Normalize one bare address with the same provider matching policy.
+pub fn normalize_strict(email: &str) -> Result<EmailIdentity, Error> {
+    let mut output = [0u8; OUTPUT_CAPACITY];
+    let parts = normalize_strict_into(email, &mut output)?;
+    let (domain, rest) = output.split_at(parts.domain_len);
+    Ok(EmailIdentity {
+        domain: std::str::from_utf8(domain).map_err(|_| Error::InvalidEmail)?.to_owned(),
+        canonical: std::str::from_utf8(&rest[..parts.canonical_len]).map_err(|_| Error::InvalidEmail)?.to_owned(),
+        provider: parts.provider,
+    })
+}
+
+/// Return a matching key with address-only validation.
+pub fn canonicalize_strict(email: &str) -> Result<String, Error> {
+    let mut output = [0u8; OUTPUT_CAPACITY];
+    let parts = normalize_strict_into(email, &mut output)?;
     let bytes = &output[parts.domain_len..parts.domain_len + parts.canonical_len];
     Ok(std::str::from_utf8(bytes).map_err(|_| Error::InvalidEmail)?.to_owned())
 }

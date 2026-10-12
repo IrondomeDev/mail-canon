@@ -3,5 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="../src/MailCanon.csproj" />
     <None Include="../../testdata/vectors.tsv" CopyToOutputDirectory="PreserveNewest" Link="vectors.tsv" />
+    <None Include="../../testdata/strict-vectors.tsv" CopyToOutputDirectory="PreserveNewest" Link="strict-vectors.tsv" />
   </ItemGroup>
 </Project>

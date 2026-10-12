@@ -30,6 +30,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install .
+      - run: python -m pip check
       - run: python -m unittest discover -s tests -v
       - run: python -m pip wheel --no-deps . --wheel-dir dist
 
@@ -92,6 +93,10 @@ jobs:
   go:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.25.x', 'stable']
     defaults:
       run:
         working-directory: go
@@ -101,10 +106,13 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          go-version-file: go/go.mod
+          go-version: ${{ matrix.go }}
           cache: false
       - run: go mod tidy
+      - run: git diff --exit-code -- go.mod go.sum
+      - run: go mod verify
       - run: go test -race ./...
+      - run: go vet ./...
       - run: go test -run='^$' -fuzz=FuzzNormalize -fuzztime=10s -parallel=2
       - run: test -z "$(gofmt -l .)"
 

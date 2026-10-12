@@ -44,9 +44,13 @@ try {
 The `intl` extension is required for the supported package, even though ASCII domains do not invoke it. The parser rejects non-string arguments explicitly, including when the caller uses PHP's coercive mode.
 
 
+## Address fields and display imports
+
+Use `normalizeStrict` / `canonicalizeStrict` for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `php/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `php/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 composer install

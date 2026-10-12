@@ -1,4 +1,33 @@
-use mail_canon::{canonicalize, normalize, normalize_into, Error, OUTPUT_CAPACITY};
+use mail_canon::{canonicalize, normalize, normalize_into, canonicalize_strict, normalize_strict, normalize_strict_into, Error, OUTPUT_CAPACITY};
+
+#[test]
+fn strict_vectors() {
+    for row in include_str!("../../testdata/strict-vectors.tsv").lines().filter(|s| !s.starts_with('#')) {
+        let fields: Vec<_> = row.split('\t').collect();
+        let raw = unhex(fields[1]);
+        let name = fields[0];
+        let mut output = [0xa5; OUTPUT_CAPACITY];
+        if fields[2] == "-" {
+            assert_eq!(normalize_strict(&raw), Err(Error::InvalidEmail), "{name}");
+            assert_eq!(canonicalize_strict(&raw), Err(Error::InvalidEmail), "{name}");
+            assert_eq!(normalize_strict_into(&raw, &mut output), Err(Error::InvalidEmail), "{name}");
+            assert!(output.iter().all(|&b| b == 0xa5));
+        } else {
+            let value = normalize_strict(&raw).unwrap_or_else(|e| panic!("{name}: {e}"));
+            assert_eq!(value.domain, fields[2], "{name}");
+            assert_eq!(value.canonical, fields[3], "{name}");
+            assert_eq!(value.provider.as_str(), fields[4], "{name}");
+            assert_eq!(canonicalize_strict(&raw).unwrap(), fields[3], "{name}");
+            assert_eq!(canonicalize_strict(&value.canonical).unwrap(), value.canonical, "{name}");
+            let p = normalize_strict_into(&raw, &mut output).unwrap();
+            assert_eq!(&output[..p.domain_len], value.domain.as_bytes(), "{name}");
+            assert_eq!(&output[p.domain_len..p.domain_len + p.canonical_len], value.canonical.as_bytes(), "{name}");
+            let mut small = vec![0xa5; p.domain_len + p.canonical_len - 1];
+            assert_eq!(normalize_strict_into(&raw, &mut small), Err(Error::BufferTooSmall));
+            assert!(small.iter().all(|&b| b == 0xa5));
+        }
+    }
+}
 
 fn unhex(hex: &str) -> String {
     let bytes: Vec<u8> = hex.as_bytes().chunks_exact(2).map(|pair| {

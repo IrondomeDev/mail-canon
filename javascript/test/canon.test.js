@@ -2,7 +2,23 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import test from 'node:test';
-import {InvalidEmail, normalize, canonicalize} from '../index.js';
+import {InvalidEmail, normalize, canonicalize, normalizeStrict, canonicalizeStrict} from '../index.js';
+
+for (const row of readFileSync(new URL('../../testdata/strict-vectors.tsv', import.meta.url), 'utf8').trimEnd().split('\n')) {
+  if (row.startsWith('#')) continue;
+  const [name, encoded, domain, canonical, provider] = row.split('\t');
+  test(`strict: ${name}`, () => {
+    const raw = Buffer.from(encoded, 'hex').toString('utf8');
+    if (domain === '-') {
+      assert.throws(() => normalizeStrict(raw), InvalidEmail);
+      assert.throws(() => canonicalizeStrict(raw), InvalidEmail);
+    } else {
+      assert.deepEqual(normalizeStrict(raw), {domain, canonical, provider});
+      assert.equal(canonicalizeStrict(raw), canonical);
+      assert.equal(canonicalizeStrict(canonical), canonical);
+    }
+  });
+}
 
 const rows = readFileSync(new URL('../../testdata/vectors.tsv', import.meta.url), 'utf8').trimEnd().split('\n');
 for (const row of rows) {
@@ -23,19 +39,22 @@ for (const row of rows) {
 
 test('non-string inputs are not coerced', () => {
   for (const raw of [null, undefined, true, 12, {}, [], new String('u@example.com')]) {
-    for (const fn of [normalize, canonicalize]) assert.throws(() => fn(raw), TypeError);
+    for (const fn of [normalize, canonicalize, normalizeStrict, canonicalizeStrict]) assert.throws(() => fn(raw), TypeError);
   }
 });
 
 test('ill-formed UTF-16 is rejected before wrapper removal', () => {
   for (const raw of ['\ud800@example.com', 'name \udfff <u@example.com>']) {
     assert.throws(() => normalize(raw), InvalidEmail);
+    assert.throws(() => normalizeStrict(raw), InvalidEmail);
   }
 });
 
 test('CommonJS and ESM use the same implementation', () => {
   const require = createRequire(import.meta.url);
   assert.equal(require('../index.cjs').normalize, normalize);
+  assert.equal(require('../index.cjs').normalizeStrict, normalizeStrict);
+  assert.equal(require('../index.cjs').canonicalizeStrict, canonicalizeStrict);
 });
 
 test('deterministic random inputs remain bounded and idempotent', () => {

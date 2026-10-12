@@ -48,9 +48,13 @@ fn main() -> Result<(), mail_canon::Error> {
 The caller-buffer operation allocates no heap memory for ASCII input. The owned helpers allocate their returned strings. IDNA processing may allocate. All code is safe Rust.
 
 
+## Address fields and display imports
+
+Use `normalize_strict` / `canonicalize_strict` (or `normalize_strict_into`) for untrusted address fields. It rejects whitespace, display wrappers, `mailto:`, and explicit cleanup characters. Use the existing normalizer only for intentional display imports. Both paths reject controls and ambiguous wrappers; canonical keys still require mailbox verification before account linking.
+
 ## Validate and measure
 
-Run from the `rust/` directory of the complete repository; tests use `../testdata/vectors.tsv`.
+Run from the `rust/` directory of the complete repository; tests use both shared corpora in `../testdata/`.
 
 ```sh
 cargo test

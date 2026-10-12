@@ -27,6 +27,20 @@ Provider:   gmail
 
 This is an unreleased 0.1.0 source tree. Package names are proposed identifiers, not claims that registry releases or namespace ownership have been established. Each README shows local installation.
 
+## Strict input validation
+
+For untrusted address fields, use the strict address-only API:
+
+| Language | Identity / canonical key |
+| --- | --- |
+| Python | `normalize_strict` / `canonicalize_strict` |
+| Rust | `normalize_strict` / `canonicalize_strict` / `normalize_strict_into` |
+| JavaScript, Java, PHP | `normalizeStrict` / `canonicalizeStrict` |
+| Go | `NormalizeStrict` / `CanonicalizeStrict` |
+| C# | `NormalizeStrict` / `CanonicalizeStrict` / `TryNormalizeStrict` |
+
+Strict parsing rejects wrappers, `mailto:`, whitespace, query/fragment suffixes, and explicit cleanup characters. Unicode domains still use native IDNA mapping. Existing `normalize` / `canonicalize` APIs remain available for deliberate display imports; all APIs reject controls, extra recipients in wrappers, and trailing wrapper content. Pass the returned address to downstream code rather than treating an accepted import as proof that the original string is safe.
+
 ## Matching policy
 
 All accepted local parts and domains are lowercased. Provider rules apply only to the exact domains listed here, not to their subdomains or custom domains hosted by those providers.
@@ -44,17 +58,17 @@ For example, `First.Last+news@example.com` becomes `first.last+news@example.com`
 
 ## Integration boundaries
 
-Canonicalization is a lossy matching policy, not proof that two addresses belong to one person. Keep the submitted address separately and verify mailbox ownership before account linking or merging. Lowercasing a custom-domain local part and folding Apple legacy domains can conflate addresses under some configurations. A provider group is a rule label, not a verified hosting or deliverability result.
+Canonicalization is a lossy matching policy, not proof that two addresses belong to one person. Never authorize login, recovery, account linking, or merging solely from canonical equality. Keep the submitted address separately and verify ownership of every mailbox involved. Lowercasing a custom-domain local part and folding Apple legacy domains can conflate addresses under some configurations. A provider group is a rule label, not a verified hosting or deliverability result.
 
 The parser deliberately supports a restricted ASCII local part, not every RFC mailbox syntax. It accepts limited `mailto:` and display-name wrappers, performs bounded Unicode cleanup, and converts supported internationalized domains to ASCII. It does not decode URL escapes or support internationalized local parts.
 
-Native IDNA libraries differ in Unicode versions and acceptance rules. The shared corpus tests the documented examples; exhaustive Unicode acceptance parity across runtimes is not promised. See [the behavior contract](docs/BEHAVIOR.md) before using outputs as persistent matching keys.
+Native IDNA libraries differ in Unicode versions and acceptance rules. The shared corpus tests the documented examples; exhaustive Unicode acceptance parity across runtimes is not promised. Persist one authoritative normalization result across services; do not independently derive identity keys in different languages. Treat dependency/profile changes as explicit key migrations. See [the behavior contract](docs/BEHAVIOR.md).
 
 ## Tests and performance
 
-All seven test suites consume [the same 177 vectors](testdata/vectors.tsv). They cover provider rules, cleanup, malformed inputs, limits, and canonical-output idempotence. Each package README contains its test command. The proposed CI workflow runs complete suites without silently skipping IDNA cases.
+All seven test suites consume the shared [normalization](testdata/vectors.tsv) and [strict-address](testdata/strict-vectors.tsv) corpora. They cover provider rules, cleanup, malformed inputs, limits, and canonical-output idempotence. Each package README contains its test command. The proposed CI workflow runs complete suites without silently skipping IDNA cases.
 
-Input is bounded at 512 UTF-8 bytes before cleanup. ASCII paths bypass IDNA. Rust additionally exposes a caller-buffer path with no heap allocation for ASCII input. Benchmarks are included for Python, JavaScript, and Go. They measure local execution, not a latency guarantee or a cross-language ranking.
+Input is bounded at 512 UTF-8 bytes before cleanup. Ordinary ASCII domains bypass IDNA; ASCII Punycode labels are validated through IDNA. Rust additionally exposes a caller-buffer path with no heap allocation for ordinary ASCII input without Punycode. Benchmarks are included for Python, JavaScript, and Go. They measure local execution, not a latency guarantee or a cross-language ranking.
 
 ## Development and release
 

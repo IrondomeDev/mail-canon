@@ -35,10 +35,38 @@ func ascii(s string) bool {
 
 func trim(s string) string { return strings.Trim(s, " \t\n\r\f") }
 
+func hasACE(domain string) bool {
+	for domain != "" {
+		label, rest, _ := strings.Cut(domain, ".")
+		if len(label) >= 4 && strings.EqualFold(label[:4], "xn--") {
+			return true
+		}
+		domain = rest
+	}
+	return false
+}
+
 // Normalize returns an identity or ErrInvalidEmail. It does not query the network.
 func Normalize(email string) (Identity, error) {
+	return normalize(email, false)
+}
+
+// NormalizeStrict accepts one bare address without wrappers, whitespace or cleanup.
+func NormalizeStrict(email string) (Identity, error) {
+	return normalize(email, true)
+}
+
+func normalize(email string, strict bool) (Identity, error) {
 	if len(email) == 0 || len(email) > 512 || !utf8.ValidString(email) {
 		return Identity{}, ErrInvalidEmail
+	}
+	for _, c := range email {
+		if c < 32 || c >= 127 && c <= 159 || c == '\u2028' || c == '\u2029' {
+			return Identity{}, ErrInvalidEmail
+		}
+		if strict && (unicode.IsSpace(c) || strings.ContainsRune("<>:?#\u200b\u200c\u200d\ufeff\u2060\uff0e\u3002\uff61\u2024\uff0b\ufe62\uff20", c)) {
+			return Identity{}, ErrInvalidEmail
+		}
 	}
 	value := strings.TrimFunc(email, unicode.IsSpace)
 	if !ascii(value) {
@@ -67,8 +95,9 @@ func Normalize(email string) (Identity, error) {
 		}
 	}
 	left, right := strings.IndexByte(value, '<'), strings.LastIndexByte(value, '>')
-	if left >= 0 && right >= 0 {
-		if left >= right {
+	if left >= 0 || right >= 0 {
+		if left < 0 || right <= left || right != len(value)-1 ||
+			strings.ContainsAny(value[:left], "@<>,;:") || strings.ContainsAny(value[left+1:right], "<>") {
 			return Identity{}, ErrInvalidEmail
 		}
 		value = trim(value[left+1 : right])
@@ -96,7 +125,7 @@ func Normalize(email string) (Identity, error) {
 		}
 		localBytes[i] = b
 	}
-	if !ascii(domain) {
+	if !ascii(domain) || hasACE(domain) {
 		converted, err := domainProfile.ToASCII(domain)
 		if err != nil {
 			return Identity{}, ErrInvalidEmail
@@ -176,5 +205,11 @@ func Normalize(email string) (Identity, error) {
 // Canonicalize returns only the canonical address with Normalize's validation.
 func Canonicalize(email string) (string, error) {
 	identity, err := Normalize(email)
+	return identity.Canonical, err
+}
+
+// CanonicalizeStrict returns a matching key with NormalizeStrict's validation.
+func CanonicalizeStrict(email string) (string, error) {
+	identity, err := NormalizeStrict(email)
 	return identity.Canonical, err
 }
