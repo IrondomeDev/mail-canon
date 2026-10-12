@@ -8,12 +8,10 @@ Go 1.25+ and `golang.org/x/net/idna`.
 
 ## Install and use
 
-In an existing application module, use a local replacement before a release exists:
+In an existing application module:
 
 ```sh
-go mod edit -require=github.com/IrondomeDev/mail-canon/go@v0.0.0
-go mod edit -replace=github.com/IrondomeDev/mail-canon/go=/path/to/mail-canon/go
-go mod tidy
+go get github.com/IrondomeDev/mail-canon/go@v0.1.0
 ```
 
 ```go
@@ -55,4 +53,4 @@ go test -run='^$' -bench=BenchmarkNormalize -benchmem
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+For local development, use `go mod edit -replace=github.com/IrondomeDev/mail-canon/go=/path/to/mail-canon/go`. Licensed under [MIT](LICENSE).

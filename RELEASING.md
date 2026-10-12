@@ -18,11 +18,21 @@ Each package owns its manifest version and release artifact. Use language-prefix
 
 Public Packagist expects `composer.json` at the repository root; see its [submission guidance](https://packagist.org/about?type=application). Before a Packagist release, create a generated distribution mirror with `php/` as its root and standard `vX.Y.Z` tags. Continue editing PHP in this monorepo. The mirror should contain generated releases rather than a separate development history to maintain manually. Local Composer path installation remains available before publication.
 
-## Private review
+## Registry access
 
-Keep this repository private until the owner finishes reviewing the source, documentation, package identifiers, and license. The MIT license is included at the root and in every package. Adding it does not change GitHub repository visibility.
+The MIT license is included at the root and in every package. Source review precedes public releases; repository visibility and registry publishing are separate steps.
 
-No packages have been published from this source tree. Do not treat proposed registry names as reserved namespaces. Existing CI only builds and tests; it does not publish artifacts.
+Existing CI only builds and tests; it does not publish artifacts. Publish from the relevant package directory after the tagged commit passes CI:
+
+- Rust: `cargo publish` with a crates.io account and publishing token configured using `cargo login`.
+- JavaScript: `npm publish --access public` after `npm login`. The package uses the existing `@irondome-dev` organization. Complete any requested browser/2FA approval.
+- Go: push `go/vX.Y.Z` to the public repository, then resolve `github.com/IrondomeDev/mail-canon/go@vX.Y.Z` through the public Go proxy. No separate registry account is needed.
+- Python: publication is on hold pending PyPI organization approval.
+- PHP: submit the public PHP distribution mirror to [Packagist](https://packagist.org/about) using an authorized maintainer account. Composer is the package manager.
+- Java: verify the `dev.irondome` namespace in [Maven Central](https://central.sonatype.org/register/namespace/), configure signing, and supply Central publishing credentials. Maven or Gradle can consume the artifacts. The current build does not yet configure Central deployment.
+- C#: create the package with `dotnet pack src/MailCanon.csproj -c Release -o artifacts` from `csharp/`, then use `dotnet nuget push` with a scoped [NuGet.org API key](https://learn.microsoft.com/en-us/nuget/nuget-org/publish-a-package). Confirm the intended package owner before publishing.
+
+Never commit registry tokens, API keys, or signing keys. Configure them in local credential stores or the publishing environment.
 
 ## First public release
 

@@ -8,17 +8,16 @@ Node.js 20+ for the test runner; ESM, CommonJS, and bundler-based browser applic
 
 ## Install and use
 
-Create an npm tarball from this repository's `javascript/` directory:
+Install from npm:
 
 ```sh
-npm install
-npm pack
+npm install @irondome-dev/mail-canon
 ```
 
-Install the generated `.tgz` in your application using `npm install /path/to/irondome-mail-canon-0.1.0.tgz`. This installs the declared `tr46` dependency.
+This installs the declared `tr46` dependency.
 
 ```js
-import {normalize, canonicalize, InvalidEmail} from '@irondome/mail-canon';
+import {normalize, canonicalize, InvalidEmail} from '@irondome-dev/mail-canon';
 
 const result = normalize('Alice.Example+news@GoogleMail.com');
 // {domain: 'googlemail.com', canonical: 'aliceexample@gmail.com', provider: 'gmail'}
@@ -32,7 +31,7 @@ try {
 }
 ```
 
-CommonJS uses `const {normalize} = require('@irondome/mail-canon')`. TypeScript declarations cover both import styles. `normalize` is synchronous. Browser applications need a bundler that resolves CommonJS and `tr46`; the ESM wrapper is not a standalone browser script. No Node-specific API is used in the parser.
+CommonJS uses `const {normalize} = require('@irondome-dev/mail-canon')`. TypeScript declarations cover both import styles. `normalize` is synchronous. Browser applications need a bundler that resolves CommonJS and `tr46`; the ESM wrapper is not a standalone browser script. No Node-specific API is used in the parser.
 
 
 ## Address fields and display imports
@@ -52,4 +51,4 @@ npm pack --dry-run
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+For local development, run `npm pack` from `javascript/` and install the resulting tarball in your application. Licensed under [MIT](LICENSE).

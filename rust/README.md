@@ -8,11 +8,11 @@ A current stable Rust toolchain and the `idna` crate. A minimum supported Rust v
 
 ## Install and use
 
-Add a path dependency to your application's `Cargo.toml`:
+Add the package to your application's `Cargo.toml`:
 
 ```toml
 [dependencies]
-mail-canon = { package = "irondome-mail-canon", path = "/path/to/mail-canon/rust" }
+mail-canon = { package = "irondome-mail-canon", version = "0.1.0" }
 ```
 
 ```rust
@@ -64,4 +64,4 @@ cargo package --list
 
 See [API.md](API.md) for every public function, result field, error, and integration boundary. Keep the original address separately and verify mailbox ownership before linking accounts. Unicode-domain acceptance is not guaranteed to be identical across every runtime.
 
-This is unreleased source. Registry identifiers are proposed, and installation examples use local files rather than implying a published package exists. Licensed under [MIT](LICENSE).
+For local development, replace `version = "0.1.0"` with `path = "/path/to/mail-canon/rust"`. Licensed under [MIT](LICENSE).

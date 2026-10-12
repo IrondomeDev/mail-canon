@@ -1,6 +1,6 @@
 # IronDome Mail Canon
 
-[![Status: pre-release](https://img.shields.io/badge/status-pre--release-F76808)](#packages)
+[![Releases](https://img.shields.io/badge/releases-package_versions-F76808)](https://github.com/IrondomeDev/mail-canon/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-F76808)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-behavior_contract-F76808)](docs/BEHAVIOR.md)
 [![CI](https://img.shields.io/badge/CI-package_checks-F76808)](https://github.com/IrondomeDev/mail-canon/actions/workflows/ci.yml)
@@ -26,13 +26,13 @@ Provider:   gmail
 | --- | --- | --- |
 | [python](python/README.md) | `irondome-mail-canon` | `mail_canon.normalize`, `canonicalize` |
 | [rust](rust/README.md) | `irondome-mail-canon` | `mail_canon::{normalize, canonicalize, normalize_into}` |
-| [javascript](javascript/README.md) | `@irondome/mail-canon` | ESM and CommonJS, TypeScript declarations |
+| [javascript](javascript/README.md) | `@irondome-dev/mail-canon` | ESM and CommonJS, TypeScript declarations |
 | [java](java/README.md) | `dev.irondome:mail-canon` | `MailCanon.normalize`, `canonicalize` |
 | [go](go/README.md) | `github.com/IrondomeDev/mail-canon/go` | `mailcanon.Normalize`, `Canonicalize` |
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
 | [csharp](csharp/README.md) | `IronDome.MailCanon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
-**Pre-release:** this is an unreleased 0.1.0 source tree, kept private for review. Package names are proposed identifiers; registry availability and namespace ownership have not been established. Use the local installation instructions in each package guide.
+Package releases are independent. See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes. Python publication is pending organization approval; Java, PHP, and C# currently use the source installation instructions in their package guides.
 
 ## Quick start
 
@@ -49,18 +49,14 @@ result = normalize_strict("Alice.Example+news@GoogleMail.com")
 print(result.canonical)  # aliceexample@gmail.com
 ```
 
-For JavaScript, build and install a local tarball:
+For JavaScript:
 
 ```sh
-cd javascript
-npm install
-npm pack
-# Run in your application directory, using the actual tarball path:
-npm install /path/to/irondome-mail-canon-0.1.0.tgz
+npm install @irondome-dev/mail-canon
 ```
 
 ```javascript
-import { normalizeStrict } from '@irondome/mail-canon';
+import { normalizeStrict } from '@irondome-dev/mail-canon';
 
 const result = normalizeStrict('Alice.Example+news@GoogleMail.com');
 console.log(result.canonical); // aliceexample@gmail.com

@@ -1,5 +1,5 @@
 {
-  "name": "@irondome/mail-canon",
+  "name": "@irondome-dev/mail-canon",
   "version": "0.1.0",
   "description": "Bounded, provider-aware email normalization",
   "type": "module",
@@ -29,6 +29,13 @@
   ],
   "sideEffects": false,
   "license": "MIT",
+  "homepage": "https://github.com/IrondomeDev/mail-canon#readme",
+  "bugs": { "url": "https://github.com/IrondomeDev/mail-canon/issues" },
+  "keywords": ["email", "normalization", "canonicalization", "idna", "irondome"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": ">=20"
   },
