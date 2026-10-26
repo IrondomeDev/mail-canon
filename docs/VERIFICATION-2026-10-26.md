@@ -15,6 +15,5 @@ Existing Microsoft semantics are retained.
 - .NET SDK 8.0.418: display/strict/null/UTF-16 checks pass; local NuGet pack succeeds.
 
 [Raw qualification logs](../evidence/provider-policy-tests-2026-10-26.txt).
-Windows and other CI matrices were not run locally. No registry publication or
-Git push was performed. Before upgrading persisted canonical keys, audit collisions
+Windows and other CI matrices were not run locally. The implementation has been pushed; no registry publication was performed. Before upgrading persisted canonical keys, audit collisions
 and migrate them under the consuming application's ownership policy.
