@@ -14,7 +14,7 @@ Return `true` and an identity for accepted input. Return `false` and `default(Em
 
 ### `EmailIdentity`
 
-Readonly record struct containing the three result strings. Manual construction does not validate them. Provider values are the six lowercase names below.
+Readonly record struct containing the three result strings. Manual construction does not validate them. Provider values are the seven lowercase names below.
 
 ### `InvalidEmailException`
 
@@ -40,7 +40,7 @@ Input must be a string containing at most 512 UTF-8 bytes before cleanup. The lo
 
 In display parsing, outer non-control Unicode whitespace is trimmed; five invisible formatting characters are removed; selected fullwidth punctuation is mapped. Limited `mailto:` and `Name <address>` wrappers are accepted. `mailto:` query/fragment suffixes are discarded, not decoded. Ordinary ASCII domains are checked directly; Unicode domains and ASCII `xn--` labels are validated through IDNA. One trailing root dot is removed. Domain labels are 1 through 63 bytes, the domain is at most 253 bytes, and `len(domain) + len(canonical)` is at most 512 ASCII bytes.
 
-All local parts are lowercased. Gmail removes dots and `+tags` and folds `googlemail.com` to `gmail.com`. Microsoft consumer domains remove `+tags` but keep dots and domains. iCloud removes `+tags` and folds `me.com` and `mac.com` to `icloud.com`. Proton removes `+tags` but preserves its three domains. Yahoo and custom domains preserve dots, plus tags, and hyphens. An empty or dot-ending base after alias removal is rejected.
+All local parts are lowercased. Gmail removes dots and `+tags` and folds `googlemail.com` to `gmail.com`. Microsoft consumer domains remove `+tags` but keep dots and domains. iCloud removes `+tags` and folds `me.com` and `mac.com` to `icloud.com`. Proton removes `+tags`, then removes `.`, `_`, and `-` from the retained base; its domains remain distinct. Fastmail removes `+tags` on its exact 130 first-party domains. For one-level Fastmail subdomains of those roots, `tag@user.root` maps to `user@root`; the returned domain remains the normalized input domain. Fastmail keeps dots and does not guess multilevel subdomains or custom domains. Yahoo and custom domains preserve dots, plus tags, and hyphens. An empty or dot-ending base after alias removal is rejected.
 
 Only exact provider domains match. Custom Google Workspace or Microsoft 365 domains do not inherit consumer rules. The returned `domain` is always the normalized input domain, not necessarily the domain after `@` in `canonical`.
 

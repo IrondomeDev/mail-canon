@@ -23,3 +23,22 @@ Yahoo rewriting is conservative: no suffix stripping or domain folding is attemp
 - C#: [`IdnMapping`](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.idnmapping), [`ReadOnlySpan<T>`](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1), and [.NET globalization and ICU](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu).
 
 IDNA is deliberately a dependency or runtime capability. A homegrown punycode encoder is not a substitute for normalization, mapping, validation, and bidirectional checks.
+
+
+## Provider additions checked 2026-10-26
+
+- Proton's [username rules](https://proton.me/support/change-username) document
+  case and transparent `.`, `_`, `-`. Its [Key Transparency specification](https://proton.me/files/proton_keytransparency_whitepaper.pdf),
+  section 3.2, defines stripping the first plus suffix before punctuation while
+  retaining the domain. [Address documentation](https://proton.me/support/addresses-and-aliases)
+  includes the legacy `protonmail.ch` domain. Domains remain distinct here.
+- Fastmail's [published first-party domains](https://www.fastmail.help/hc/en-us/articles/6239365719055-What-domains-can-I-use-with-Fastmail)
+  supply the static 130-domain allowlist. Its [plus/subdomain rules](https://www.fastmail.help/hc/en-us/articles/360060591053-Plus-addressing-and-subdomain-addressing)
+  and [delivery order](https://www.fastmail.help/hc/en-us/articles/1500000278262-The-email-delivery-process)
+  support bounded first-party handling. Arbitrary custom-domain routing stays out
+  of scope because administrators select its behavior.
+- Microsoft's [consumer plus-address documentation](https://support.microsoft.com/en-us/outlook/send-email-from-a-different-address-in-outlook-com)
+  confirms the pre-existing Outlook family rule. Dots and domain names stay distinct.
+- Apple's [legacy-domain history](https://support.apple.com/en-us/118230)
+  explains why that existing matching policy is unsuitable as automatic proof of
+  mailbox/account identity. This change does not broaden Apple matching.

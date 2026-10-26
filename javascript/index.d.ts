@@ -1,4 +1,4 @@
-export type Provider = 'custom' | 'gmail' | 'microsoft' | 'icloud' | 'proton' | 'yahoo';
+export type Provider = 'custom' | 'gmail' | 'microsoft' | 'icloud' | 'proton' | 'fastmail' | 'yahoo';
 export interface EmailIdentity {
   readonly domain: string;
   readonly canonical: string;

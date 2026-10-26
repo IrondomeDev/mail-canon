@@ -14,6 +14,139 @@ public sealed class InvalidEmailException : FormatException
 public static class EmailNormalizer
 {
     private static readonly IdnMapping Idn = new() { UseStd3AsciiRules = true, AllowUnassigned = false };
+    private static readonly HashSet<string> FastmailDomains = new(StringComparer.Ordinal)
+    {
+        "123mail.org",
+        "150mail.com",
+        "150ml.com",
+        "16mail.com",
+        "2-mail.com",
+        "4email.net",
+        "50mail.com",
+        "airpost.net",
+        "aliencamel.com",
+        "allmail.net",
+        "bestmail.us",
+        "cluemail.com",
+        "elitemail.org",
+        "emailcorner.net",
+        "emailengine.net",
+        "emailengine.org",
+        "emailgroups.net",
+        "emailplus.org",
+        "emailuser.net",
+        "eml.cc",
+        "f-m.fm",
+        "fast-email.com",
+        "fast-mail.org",
+        "fastem.com",
+        "fastemail.us",
+        "fastemailer.com",
+        "fastest.cc",
+        "fastimap.com",
+        "fastmail.ca",
+        "fastmail.cn",
+        "fastmail.co.uk",
+        "fastmail.com",
+        "fastmail.com.au",
+        "fastmail.de",
+        "fastmail.es",
+        "fastmail.fm",
+        "fastmail.fr",
+        "fastmail.im",
+        "fastmail.in",
+        "fastmail.jp",
+        "fastmail.mx",
+        "fastmail.net",
+        "fastmail.nl",
+        "fastmail.org",
+        "fastmail.se",
+        "fastmail.to",
+        "fastmail.tw",
+        "fastmail.uk",
+        "fastmail.us",
+        "fastmailbox.net",
+        "fastmessaging.com",
+        "fea.st",
+        "fmail.co.uk",
+        "fmailbox.com",
+        "fmgirl.com",
+        "fmguy.com",
+        "foobox.com",
+        "foobox.net",
+        "ftml.net",
+        "h-mail.us",
+        "hailmail.net",
+        "imap-mail.com",
+        "imap.cc",
+        "imapmail.org",
+        "immerbox.com",
+        "immermail.com",
+        "inoutbox.com",
+        "internet-e-mail.com",
+        "internet-mail.org",
+        "internetemails.net",
+        "internetmailing.net",
+        "jetemail.net",
+        "justemail.net",
+        "letterboxes.org",
+        "lifetimeaddress.com",
+        "mail-central.com",
+        "mail-page.com",
+        "mailas.com",
+        "mailbolt.com",
+        "mailc.net",
+        "mailcan.com",
+        "mailforce.net",
+        "mailhaven.com",
+        "mailingaddress.org",
+        "mailite.com",
+        "mailmight.com",
+        "mailnew.com",
+        "mailsent.net",
+        "mailservice.ms",
+        "mailup.net",
+        "mailworks.org",
+        "mailzone.com",
+        "ml1.net",
+        "mm.st",
+        "myfastmail.com",
+        "mymacmail.com",
+        "nospammail.net",
+        "onepost.net",
+        "ownmail.net",
+        "penguinmail.com",
+        "permanentmail.com",
+        "petml.com",
+        "pobox.com",
+        "postinbox.com",
+        "postpro.net",
+        "proinbox.com",
+        "promessage.com",
+        "realemail.net",
+        "reallyfast.biz",
+        "reallyfast.info",
+        "rushpost.com",
+        "sent.as",
+        "sent.at",
+        "sent.com",
+        "siemprebox.com",
+        "siempremail.com",
+        "speedpost.net",
+        "speedymail.org",
+        "ssl-mail.com",
+        "swift-mail.com",
+        "the-fastest.net",
+        "the-quickest.com",
+        "theinternetemail.com",
+        "veribox.net",
+        "veryfast.biz",
+        "veryspeedy.net",
+        "warpmail.net",
+        "xsmail.com",
+        "yepmail.net",
+        "your-mail.com"
+    };
 
     private static bool ContainsRtl(char c) => c is >= '\u0590' and <= '\u08ff'
         or >= '\ufb1d' and <= '\ufdff' or >= '\ufe70' and <= '\ufeff';
@@ -183,22 +316,56 @@ public static class EmailNormalizer
         }
         if (dots == 0 || start == domain.Length || domain.Length - start > 63 || domainBuffer[start] == '-' || domainBuffer[domain.Length - 1] == '-') throw new InvalidEmailException();
         string normalizedDomain = new(domainBuffer[..domain.Length]);
+        string? fastmailUsername = null;
+        string? fastmailRoot = null;
         string provider = normalizedDomain switch
         {
             "gmail.com" or "googlemail.com" => "gmail",
             "outlook.com" or "hotmail.com" or "live.com" or "msn.com" => "microsoft",
             "icloud.com" or "me.com" or "mac.com" => "icloud",
-            "proton.me" or "protonmail.com" or "pm.me" => "proton",
+            "proton.me" or "protonmail.com" or "protonmail.ch" or "pm.me" => "proton",
             "yahoo.com" or "ymail.com" or "rocketmail.com" => "yahoo", _ => "custom"
         };
-        string mappedDomain = provider switch { "gmail" => "gmail.com", "icloud" => "icloud.com", _ => normalizedDomain };
+        if (provider == "custom")
+        {
+            if (FastmailDomains.Contains(normalizedDomain)) fastmailRoot = normalizedDomain;
+            else if (dots >= 2)
+            {
+                int dot = normalizedDomain.IndexOf('.');
+                string root = normalizedDomain[(dot + 1)..];
+                if (FastmailDomains.Contains(root))
+                {
+                    fastmailRoot = root;
+                    fastmailUsername = normalizedDomain[..dot];
+                }
+            }
+            if (fastmailRoot is not null) provider = "fastmail";
+        }
+        string mappedDomain = provider switch { "gmail" => "gmail.com", "icloud" => "icloud.com",
+            "fastmail" => fastmailRoot!, _ => normalizedDomain };
         int length = local.Length;
-        if (provider is not ("custom" or "yahoo"))
+        if (provider == "fastmail" && fastmailUsername is not null)
+        {
+            length = fastmailUsername.Length;
+            fastmailUsername.AsSpan().CopyTo(localBuffer);
+        }
+        else if (provider is not ("custom" or "yahoo"))
         {
             int plus = localBuffer[..length].IndexOf('+');
             if (plus >= 0) length = plus;
         }
-        if (provider == "gmail")
+        if (provider == "proton")
+        {
+            int write = 0;
+            for (int i = 0; i < length; i++)
+            {
+                char c = localBuffer[i];
+                if (c is '.' or '_' or '-') continue;
+                localBuffer[write++] = c;
+            }
+            length = write;
+        }
+        else if (provider == "gmail")
         {
             int write = 0;
             for (int i = 0; i < length; i++)

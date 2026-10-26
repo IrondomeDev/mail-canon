@@ -71,6 +71,32 @@ fn invalid_inputs_do_not_modify_output() {
 }
 
 #[test]
+fn proton_and_fastmail_rules() {
+    let proton = normalize_strict("User.Name_-+extra@protonmail.com").unwrap();
+    assert_eq!(proton.provider.as_str(), "proton");
+    assert_eq!(proton.domain, "protonmail.com");
+    assert_eq!(proton.canonical, "username@protonmail.com");
+    assert_eq!(canonicalize_strict(&proton.canonical).unwrap(), proton.canonical);
+
+    let direct = normalize_strict("User.Name+tag@fastmail.com").unwrap();
+    assert_eq!(direct.provider.as_str(), "fastmail");
+    assert_eq!(direct.domain, "fastmail.com");
+    assert_eq!(direct.canonical, "user.name@fastmail.com");
+
+    let alias = normalize_strict("tag@User-Name.fastmail.com.au").unwrap();
+    assert_eq!(alias.provider.as_str(), "fastmail");
+    assert_eq!(alias.domain, "user-name.fastmail.com.au");
+    assert_eq!(alias.canonical, "user-name@fastmail.com.au");
+    assert_eq!(canonicalize_strict(&alias.canonical).unwrap(), alias.canonical);
+
+    assert_eq!(normalize_strict("tag@sub.user.fastmail.com").unwrap().provider.as_str(), "custom");
+    assert_eq!(normalize_strict("tag@user.fastmail.example").unwrap().provider.as_str(), "custom");
+    let mut output = [0xa5; OUTPUT_CAPACITY];
+    assert_eq!(normalize_strict_into("+tag@proton.me", &mut output), Err(Error::InvalidEmail));
+    assert!(output.iter().all(|&b| b == 0xa5));
+}
+
+#[test]
 fn generated_inputs_are_idempotent() {
     let mut state = 82751u32;
     let alphabet: Vec<char> = "abcXYZ019._+-@<> %\t\r\n\0é。\u{200b}".chars().collect();

@@ -3,6 +3,7 @@ package dev.irondome.mailcanon;
 import com.ibm.icu.text.IDNA;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 /** A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team. */
 public final class MailCanon {
@@ -10,6 +11,139 @@ public final class MailCanon {
         private static final IDNA INSTANCE = IDNA.getUTS46Instance(IDNA.USE_STD3_RULES
             | IDNA.CHECK_BIDI | IDNA.CHECK_CONTEXTJ | IDNA.NONTRANSITIONAL_TO_ASCII);
     }
+
+    private static final Set<String> FASTMAIL_DOMAINS = Set.of(
+        "123mail.org",
+        "150mail.com",
+        "150ml.com",
+        "16mail.com",
+        "2-mail.com",
+        "4email.net",
+        "50mail.com",
+        "airpost.net",
+        "aliencamel.com",
+        "allmail.net",
+        "bestmail.us",
+        "cluemail.com",
+        "elitemail.org",
+        "emailcorner.net",
+        "emailengine.net",
+        "emailengine.org",
+        "emailgroups.net",
+        "emailplus.org",
+        "emailuser.net",
+        "eml.cc",
+        "f-m.fm",
+        "fast-email.com",
+        "fast-mail.org",
+        "fastem.com",
+        "fastemail.us",
+        "fastemailer.com",
+        "fastest.cc",
+        "fastimap.com",
+        "fastmail.ca",
+        "fastmail.cn",
+        "fastmail.co.uk",
+        "fastmail.com",
+        "fastmail.com.au",
+        "fastmail.de",
+        "fastmail.es",
+        "fastmail.fm",
+        "fastmail.fr",
+        "fastmail.im",
+        "fastmail.in",
+        "fastmail.jp",
+        "fastmail.mx",
+        "fastmail.net",
+        "fastmail.nl",
+        "fastmail.org",
+        "fastmail.se",
+        "fastmail.to",
+        "fastmail.tw",
+        "fastmail.uk",
+        "fastmail.us",
+        "fastmailbox.net",
+        "fastmessaging.com",
+        "fea.st",
+        "fmail.co.uk",
+        "fmailbox.com",
+        "fmgirl.com",
+        "fmguy.com",
+        "foobox.com",
+        "foobox.net",
+        "ftml.net",
+        "h-mail.us",
+        "hailmail.net",
+        "imap-mail.com",
+        "imap.cc",
+        "imapmail.org",
+        "immerbox.com",
+        "immermail.com",
+        "inoutbox.com",
+        "internet-e-mail.com",
+        "internet-mail.org",
+        "internetemails.net",
+        "internetmailing.net",
+        "jetemail.net",
+        "justemail.net",
+        "letterboxes.org",
+        "lifetimeaddress.com",
+        "mail-central.com",
+        "mail-page.com",
+        "mailas.com",
+        "mailbolt.com",
+        "mailc.net",
+        "mailcan.com",
+        "mailforce.net",
+        "mailhaven.com",
+        "mailingaddress.org",
+        "mailite.com",
+        "mailmight.com",
+        "mailnew.com",
+        "mailsent.net",
+        "mailservice.ms",
+        "mailup.net",
+        "mailworks.org",
+        "mailzone.com",
+        "ml1.net",
+        "mm.st",
+        "myfastmail.com",
+        "mymacmail.com",
+        "nospammail.net",
+        "onepost.net",
+        "ownmail.net",
+        "penguinmail.com",
+        "permanentmail.com",
+        "petml.com",
+        "pobox.com",
+        "postinbox.com",
+        "postpro.net",
+        "proinbox.com",
+        "promessage.com",
+        "realemail.net",
+        "reallyfast.biz",
+        "reallyfast.info",
+        "rushpost.com",
+        "sent.as",
+        "sent.at",
+        "sent.com",
+        "siemprebox.com",
+        "siempremail.com",
+        "speedpost.net",
+        "speedymail.org",
+        "ssl-mail.com",
+        "swift-mail.com",
+        "the-fastest.net",
+        "the-quickest.com",
+        "theinternetemail.com",
+        "veribox.net",
+        "veryfast.biz",
+        "veryspeedy.net",
+        "warpmail.net",
+        "xsmail.com",
+        "yepmail.net",
+        "your-mail.com"
+    );
 
     private MailCanon() {}
 
@@ -118,7 +252,7 @@ public final class MailCanon {
         String local = trim(value.substring(0, at), false);
         String domain = trim(value.substring(at + 1), false);
         if (local.isEmpty() || local.length() > 64 || domain.isEmpty()) throw invalid();
-        char[] buffer = new char[local.length()];
+        char[] buffer = new char[64];
         for (int i = 0; i < local.length(); i++) {
             char c = local.charAt(i);
             if (c >= 'A' && c <= 'Z') c += 32;
@@ -149,20 +283,47 @@ public final class MailCanon {
         }
         if (dots == 0) throw invalid();
         domain = domain.toLowerCase(Locale.ROOT);
+        String fastmailUsername = null;
+        String fastmailRoot = null;
         String provider = switch (domain) {
             case "gmail.com", "googlemail.com" -> "gmail";
             case "outlook.com", "hotmail.com", "live.com", "msn.com" -> "microsoft";
             case "icloud.com", "me.com", "mac.com" -> "icloud";
-            case "proton.me", "protonmail.com", "pm.me" -> "proton";
+            case "proton.me", "protonmail.com", "protonmail.ch", "pm.me" -> "proton";
             case "yahoo.com", "ymail.com", "rocketmail.com" -> "yahoo";
             default -> "custom";
         };
-        String mapped = switch (provider) { case "gmail" -> "gmail.com"; case "icloud" -> "icloud.com"; default -> domain; };
-        int length = buffer.length;
-        if (!provider.equals("custom") && !provider.equals("yahoo")) {
+        if (provider.equals("custom")) {
+            if (FASTMAIL_DOMAINS.contains(domain)) {
+                fastmailRoot = domain;
+            } else if (dots >= 2) {
+                int dot = domain.indexOf('.');
+                String root = domain.substring(dot + 1);
+                if (FASTMAIL_DOMAINS.contains(root)) {
+                    fastmailRoot = root;
+                    fastmailUsername = domain.substring(0, dot);
+                }
+            }
+            if (fastmailRoot != null) provider = "fastmail";
+        }
+        String mapped = switch (provider) { case "gmail" -> "gmail.com"; case "icloud" -> "icloud.com";
+            case "fastmail" -> fastmailRoot; default -> domain; };
+        int length = local.length();
+        if (provider.equals("fastmail") && fastmailUsername != null) {
+            length = fastmailUsername.length();
+            fastmailUsername.getChars(0, length, buffer, 0);
+        } else if (!provider.equals("custom") && !provider.equals("yahoo")) {
             for (int i = 0; i < length; i++) if (buffer[i] == '+') { length = i; break; }
         }
-        if (provider.equals("gmail")) {
+        if (provider.equals("proton")) {
+            int write = 0;
+            for (int i = 0; i < length; i++) {
+                char c = buffer[i];
+                if (c == '.' || c == '_' || c == '-') continue;
+                buffer[write++] = c;
+            }
+            length = write;
+        } else if (provider.equals("gmail")) {
             int write = 0;
             for (int i = 0; i < length; i++) {
                 char c = buffer[i];

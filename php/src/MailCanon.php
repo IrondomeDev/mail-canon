@@ -5,11 +5,38 @@ namespace IronDome\MailCanon;
 /** A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team. */
 final class MailCanon
 {
+    private const PROTON_SEPARATORS = ['.', '_', '-'];
+
     private const SPACE = " \t\n\r\x0c";
     private const CLEAN = [
         "\u{200b}" => '', "\u{200c}" => '', "\u{200d}" => '', "\u{feff}" => '', "\u{2060}" => '',
         "\u{ff0e}" => '.', "\u{3002}" => '.', "\u{ff61}" => '.', "\u{2024}" => '.',
         "\u{ff0b}" => '+', "\u{fe62}" => '+', "\u{ff20}" => '@',
+    ];
+    /** Exact first-party Fastmail domains from the upstream documentation list. */
+    private static array $fastmailDomains = [
+        '123mail.org' => true, '150mail.com' => true, '150ml.com' => true, '16mail.com' => true, '2-mail.com' => true, '4email.net' => true, '50mail.com' => true,
+        'airpost.net' => true, 'aliencamel.com' => true, 'allmail.net' => true, 'bestmail.us' => true, 'cluemail.com' => true, 'elitemail.org' => true,
+        'emailcorner.net' => true, 'emailengine.net' => true, 'emailengine.org' => true, 'emailgroups.net' => true, 'emailplus.org' => true, 'emailuser.net' => true,
+        'eml.cc' => true, 'f-m.fm' => true, 'fast-email.com' => true, 'fast-mail.org' => true, 'fastem.com' => true, 'fastemail.us' => true,
+        'fastemailer.com' => true, 'fastest.cc' => true, 'fastimap.com' => true, 'fastmail.ca' => true, 'fastmail.cn' => true, 'fastmail.co.uk' => true,
+        'fastmail.com' => true, 'fastmail.com.au' => true, 'fastmail.de' => true, 'fastmail.es' => true, 'fastmail.fm' => true, 'fastmail.fr' => true,
+        'fastmail.im' => true, 'fastmail.in' => true, 'fastmail.jp' => true, 'fastmail.mx' => true, 'fastmail.net' => true, 'fastmail.nl' => true,
+        'fastmail.org' => true, 'fastmail.se' => true, 'fastmail.to' => true, 'fastmail.tw' => true, 'fastmail.uk' => true, 'fastmail.us' => true,
+        'fastmailbox.net' => true, 'fastmessaging.com' => true, 'fea.st' => true, 'fmail.co.uk' => true, 'fmailbox.com' => true, 'fmgirl.com' => true,
+        'fmguy.com' => true, 'foobox.com' => true, 'foobox.net' => true, 'ftml.net' => true, 'h-mail.us' => true, 'hailmail.net' => true,
+        'imap-mail.com' => true, 'imap.cc' => true, 'imapmail.org' => true, 'immerbox.com' => true, 'immermail.com' => true, 'inoutbox.com' => true,
+        'internet-e-mail.com' => true, 'internet-mail.org' => true, 'internetemails.net' => true, 'internetmailing.net' => true, 'jetemail.net' => true, 'justemail.net' => true,
+        'letterboxes.org' => true, 'lifetimeaddress.com' => true, 'mail-central.com' => true, 'mail-page.com' => true, 'mailas.com' => true, 'mailbolt.com' => true,
+        'mailc.net' => true, 'mailcan.com' => true, 'mailforce.net' => true, 'mailhaven.com' => true, 'mailingaddress.org' => true, 'mailite.com' => true,
+        'mailmight.com' => true, 'mailnew.com' => true, 'mailsent.net' => true, 'mailservice.ms' => true, 'mailup.net' => true, 'mailworks.org' => true,
+        'mailzone.com' => true, 'ml1.net' => true, 'mm.st' => true, 'myfastmail.com' => true, 'mymacmail.com' => true, 'nospammail.net' => true,
+        'onepost.net' => true, 'ownmail.net' => true, 'penguinmail.com' => true, 'permanentmail.com' => true, 'petml.com' => true, 'pobox.com' => true,
+        'postinbox.com' => true, 'postpro.net' => true, 'proinbox.com' => true, 'promessage.com' => true, 'realemail.net' => true, 'reallyfast.biz' => true,
+        'reallyfast.info' => true, 'rushpost.com' => true, 'sent.as' => true, 'sent.at' => true, 'sent.com' => true, 'siemprebox.com' => true,
+        'siempremail.com' => true, 'speedpost.net' => true, 'speedymail.org' => true, 'ssl-mail.com' => true, 'swift-mail.com' => true, 'the-fastest.net' => true,
+        'the-quickest.com' => true, 'theinternetemail.com' => true, 'veribox.net' => true, 'veryfast.biz' => true, 'veryspeedy.net' => true, 'warpmail.net' => true,
+        'xsmail.com' => true, 'yepmail.net' => true, 'your-mail.com' => true,
     ];
 
     private function __construct() {}
@@ -76,13 +103,32 @@ final class MailCanon
             'gmail.com', 'googlemail.com' => 'gmail',
             'outlook.com', 'hotmail.com', 'live.com', 'msn.com' => 'microsoft',
             'icloud.com', 'me.com', 'mac.com' => 'icloud',
-            'proton.me', 'protonmail.com', 'pm.me' => 'proton',
+            'proton.me', 'protonmail.com', 'protonmail.ch', 'pm.me' => 'proton',
             'yahoo.com', 'ymail.com', 'rocketmail.com' => 'yahoo',
             default => 'custom',
         };
+        $fastmailSubdomain = '';
+        if ($provider === 'custom') {
+            if (isset(self::$fastmailDomains[$domain])) {
+                $provider = 'fastmail';
+            } else {
+                $dot = strpos($domain, '.');
+                if ($dot !== false && $dot > 0 && strrpos($domain, '.') > $dot) {
+                    $root = substr($domain, $dot + 1);
+                    if (isset(self::$fastmailDomains[$root])) {
+                        $provider = 'fastmail';
+                        $mappedRoot = $root;
+                        $fastmailSubdomain = substr($domain, 0, $dot);
+                    }
+                }
+            }
+        }
         $mapped = match ($provider) { 'gmail' => 'gmail.com', 'icloud' => 'icloud.com', default => $domain };
+        if (isset($mappedRoot)) { $mapped = $mappedRoot; }
         $local = strtolower($local);
-        if ($provider !== 'custom' && $provider !== 'yahoo') {
+        if ($provider === 'fastmail' && $fastmailSubdomain !== '') {
+            $local = $fastmailSubdomain;
+        } elseif ($provider !== 'custom' && $provider !== 'yahoo') {
             $plus = strpos($local, '+');
             if ($plus !== false) { $local = substr($local, 0, $plus); }
         }
@@ -90,6 +136,7 @@ final class MailCanon
             if (preg_match('/\A[a-z0-9.]+\z/', $local) !== 1) { throw new InvalidEmail(); }
             $local = str_replace('.', '', $local);
         }
+        if ($provider === 'proton') { $local = str_replace(self::PROTON_SEPARATORS, '', $local); }
         if ($local === '' || str_ends_with($local, '.')) { throw new InvalidEmail(); }
         $canonical = $local . '@' . $mapped;
         if (strlen($domain) + strlen($canonical) > 512) { throw new InvalidEmail(); }

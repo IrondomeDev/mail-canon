@@ -38,6 +38,12 @@ try {
 }
 ```
 
+Provider examples: `U_s-e.r+tag@protonmail.ch` canonicalizes to
+`user@protonmail.ch`; `news@alice.fastmail.com` has input domain
+`alice.fastmail.com` and canonical address `alice@fastmail.com`. Fastmail
+matching uses a static first-party domain list and does not infer custom-domain
+mail routing.
+
 The `intl` extension is required for the supported package, even though ASCII domains do not invoke it. The parser rejects non-string arguments explicitly, including when the caller uses PHP's coercive mode.
 
 

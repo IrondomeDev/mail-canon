@@ -40,6 +40,8 @@ Provider:   gmail
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
 | [csharp](csharp/README.md) | `mail-canon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
+The working tree prepares **0.2.0**, with Proton punctuation/legacy-domain support and Fastmail rules in all seven implementations. This candidate has not been published. Existing released versions below keep their original behavior. Stored canonical keys require an explicit collision-reviewed migration.
+
 Package releases are independent:
 
 | Language | Registry | Status |
@@ -115,14 +117,15 @@ Strict parsing rejects wrappers, `mailto:`, whitespace, query/fragment suffixes,
 
 ## Matching policy
 
-All accepted local parts and domains are lowercased. Provider rules apply only to the exact domains listed here, not to their subdomains or custom domains hosted by those providers.
+All accepted local parts and domains are lowercased. Provider rules apply to the exact domains listed here. Fastmail also recognizes one validated alias label before an allowlisted root. Arbitrary provider subdomains and custom domains hosted by those providers remain custom.
 
 | Group | Input domains | Canonical domain | Local-part transformation |
 | --- | --- | --- | --- |
 | Gmail | `gmail.com`, `googlemail.com` | `gmail.com` | Remove `+tag` and dots |
 | Microsoft | `outlook.com`, `hotmail.com`, `live.com`, `msn.com` | Keep input domain | Remove `+tag`; keep dots |
 | iCloud | `icloud.com`, `me.com`, `mac.com` | `icloud.com` | Remove `+tag`; keep dots |
-| Proton | `proton.me`, `protonmail.com`, `pm.me` | Keep input domain | Remove `+tag`; keep dots |
+| Proton | `proton.me`, `protonmail.com`, `pm.me`, `protonmail.ch` | Keep input domain | Remove `+tag`, then `.`, `_`, and `-` |
+| Fastmail | [130 exact first-party domains](testdata/fastmail-domains.txt) | Keep root domain | Remove `+tag`; map one-level `tag@user.root` to `user@root` |
 | Yahoo | `yahoo.com`, `ymail.com`, `rocketmail.com` | Keep input domain | Keep dots, plus tags, and hyphens |
 | Custom | Any other accepted domain | Keep input domain | Keep dots, plus tags, and hyphens |
 

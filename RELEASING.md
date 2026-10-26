@@ -48,3 +48,11 @@ Never commit registry tokens, API keys, or signing keys. Configure them in local
 Matching rules and IDNA dependencies can change stored account keys. Document behavior changes and migration requirements explicitly. Consumers should persist one authoritative normalization result across services and verify mailbox ownership independently of matching keys.
 
 Future release automation should publish only from reviewed tags, scope credentials to the relevant registry, and keep publishing separate from pull-request validation.
+
+
+## 0.2.0 provider candidate
+
+All seven ports share the Proton/Fastmail policy addition and the updated vector
+corpora. This is a matching-policy change: publish version 0.2.0 only after the
+normal release checks, and require collision audits before downstream key migration.
+No registry publication or remote tag is created by these source changes.

@@ -68,3 +68,15 @@ Console.WriteLine($"Passed {count} vectors, null checks, and malformed UTF-16 ch
 
 foreach (string raw in new[] { "ma\u0131lto:u@example.com", "ma\u0130lto:u@example.com" })
     Check(!EmailNormalizer.TryNormalize(raw, out _), "non-ASCII mailto prefix");
+
+var proton = EmailNormalizer.NormalizeStrict("User.Name_-+extra@protonmail.ch");
+Check(proton.Provider == "proton" && proton.Domain == "protonmail.ch" && proton.Canonical == "username@protonmail.ch", "Proton rules");
+Check(EmailNormalizer.CanonicalizeStrict(proton.Canonical) == proton.Canonical, "Proton idempotence");
+var directFastmail = EmailNormalizer.NormalizeStrict("User.Name+tag@fastmail.com");
+Check(directFastmail.Provider == "fastmail" && directFastmail.Domain == "fastmail.com" && directFastmail.Canonical == "user.name@fastmail.com", "Fastmail plus handling");
+var fastmailAlias = EmailNormalizer.NormalizeStrict("tag@User-Name.fastmail.com.au");
+Check(fastmailAlias.Provider == "fastmail" && fastmailAlias.Domain == "user-name.fastmail.com.au" && fastmailAlias.Canonical == "user-name@fastmail.com.au", "Fastmail subdomain alias");
+Check(EmailNormalizer.CanonicalizeStrict(fastmailAlias.Canonical) == fastmailAlias.Canonical, "Fastmail idempotence");
+Check(EmailNormalizer.NormalizeStrict("tag@sub.user.fastmail.com").Provider == "custom", "Fastmail rejects multilevel aliasing");
+Check(EmailNormalizer.NormalizeStrict("tag@user.fastmail.example").Provider == "custom", "Fastmail rejects unknown root");
+Check(!EmailNormalizer.TryNormalizeStrict("+tag@proton.me", out _), "Proton rejects empty canonical local part");

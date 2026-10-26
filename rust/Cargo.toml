@@ -1,6 +1,6 @@
 [package]
 name = "mail-canon"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "A simple package to normalize and canonicalise email addresses across Gmail, Outlook, Yahoo, and more, by the irondome.dev team."
 license = "MIT"

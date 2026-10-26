@@ -64,4 +64,26 @@ final class MailCanonTest {
             assertEquals("identity@gmail.com", MailCanon.canonicalize("IDENTITY@GMAIL.COM"));
         } finally { Locale.setDefault(previous); }
     }
+
+    @Test void protonAndFastmailRules() {
+        var proton = MailCanon.normalizeStrict("User.Name_-+extra@protonmail.ch");
+        assertEquals("proton", proton.provider());
+        assertEquals("protonmail.ch", proton.domain());
+        assertEquals("username@protonmail.ch", proton.canonical());
+        assertEquals(proton.canonical(), MailCanon.canonicalizeStrict(proton.canonical()));
+
+        var direct = MailCanon.normalizeStrict("User.Name+tag@fastmail.com");
+        assertEquals("fastmail", direct.provider());
+        assertEquals("fastmail.com", direct.domain());
+        assertEquals("user.name@fastmail.com", direct.canonical());
+
+        var alias = MailCanon.normalizeStrict("tag@User-Name.fastmail.com.au");
+        assertEquals("fastmail", alias.provider());
+        assertEquals("user-name.fastmail.com.au", alias.domain());
+        assertEquals("user-name@fastmail.com.au", alias.canonical());
+        assertEquals(alias.canonical(), MailCanon.canonicalizeStrict(alias.canonical()));
+        assertEquals("custom", MailCanon.normalizeStrict("tag@sub.user.fastmail.com").provider());
+        assertEquals("custom", MailCanon.normalizeStrict("tag@user.fastmail.example").provider());
+        assertThrows(MailCanon.InvalidEmailException.class, () -> MailCanon.normalizeStrict("+tag@proton.me"));
+    }
 }

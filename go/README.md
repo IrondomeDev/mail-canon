@@ -35,6 +35,12 @@ func main() {
 }
 ```
 
+Provider examples: `U_s-e.r+tag@protonmail.ch` canonicalizes to
+`user@protonmail.ch`; `news@alice.fastmail.com` has input domain
+`alice.fastmail.com` and canonical address `alice@fastmail.com`. Fastmail
+matching uses a static first-party domain list and does not infer custom-domain
+mail routing.
+
 The provider parser uses bounded buffers and an explicit domain-conversion profile. Public functions return owned strings, not slices into reused memory. The `go/` submodule is versioned separately with `go/vX.Y.Z` release tags.
 
 

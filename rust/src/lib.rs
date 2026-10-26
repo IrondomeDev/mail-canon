@@ -7,6 +7,142 @@ use std::{borrow::Cow, fmt};
 pub const MAX_INPUT_BYTES: usize = 512;
 pub const OUTPUT_CAPACITY: usize = 512;
 
+// Exact Fastmail first-party domains, embedded for allocation-free ASCII lookup.
+const FASTMAIL_DOMAINS: &[&[u8]] = &[
+    b"123mail.org",
+    b"150mail.com",
+    b"150ml.com",
+    b"16mail.com",
+    b"2-mail.com",
+    b"4email.net",
+    b"50mail.com",
+    b"airpost.net",
+    b"aliencamel.com",
+    b"allmail.net",
+    b"bestmail.us",
+    b"cluemail.com",
+    b"elitemail.org",
+    b"emailcorner.net",
+    b"emailengine.net",
+    b"emailengine.org",
+    b"emailgroups.net",
+    b"emailplus.org",
+    b"emailuser.net",
+    b"eml.cc",
+    b"f-m.fm",
+    b"fast-email.com",
+    b"fast-mail.org",
+    b"fastem.com",
+    b"fastemail.us",
+    b"fastemailer.com",
+    b"fastest.cc",
+    b"fastimap.com",
+    b"fastmail.ca",
+    b"fastmail.cn",
+    b"fastmail.co.uk",
+    b"fastmail.com",
+    b"fastmail.com.au",
+    b"fastmail.de",
+    b"fastmail.es",
+    b"fastmail.fm",
+    b"fastmail.fr",
+    b"fastmail.im",
+    b"fastmail.in",
+    b"fastmail.jp",
+    b"fastmail.mx",
+    b"fastmail.net",
+    b"fastmail.nl",
+    b"fastmail.org",
+    b"fastmail.se",
+    b"fastmail.to",
+    b"fastmail.tw",
+    b"fastmail.uk",
+    b"fastmail.us",
+    b"fastmailbox.net",
+    b"fastmessaging.com",
+    b"fea.st",
+    b"fmail.co.uk",
+    b"fmailbox.com",
+    b"fmgirl.com",
+    b"fmguy.com",
+    b"foobox.com",
+    b"foobox.net",
+    b"ftml.net",
+    b"h-mail.us",
+    b"hailmail.net",
+    b"imap-mail.com",
+    b"imap.cc",
+    b"imapmail.org",
+    b"immerbox.com",
+    b"immermail.com",
+    b"inoutbox.com",
+    b"internet-e-mail.com",
+    b"internet-mail.org",
+    b"internetemails.net",
+    b"internetmailing.net",
+    b"jetemail.net",
+    b"justemail.net",
+    b"letterboxes.org",
+    b"lifetimeaddress.com",
+    b"mail-central.com",
+    b"mail-page.com",
+    b"mailas.com",
+    b"mailbolt.com",
+    b"mailc.net",
+    b"mailcan.com",
+    b"mailforce.net",
+    b"mailhaven.com",
+    b"mailingaddress.org",
+    b"mailite.com",
+    b"mailmight.com",
+    b"mailnew.com",
+    b"mailsent.net",
+    b"mailservice.ms",
+    b"mailup.net",
+    b"mailworks.org",
+    b"mailzone.com",
+    b"ml1.net",
+    b"mm.st",
+    b"myfastmail.com",
+    b"mymacmail.com",
+    b"nospammail.net",
+    b"onepost.net",
+    b"ownmail.net",
+    b"penguinmail.com",
+    b"permanentmail.com",
+    b"petml.com",
+    b"pobox.com",
+    b"postinbox.com",
+    b"postpro.net",
+    b"proinbox.com",
+    b"promessage.com",
+    b"realemail.net",
+    b"reallyfast.biz",
+    b"reallyfast.info",
+    b"rushpost.com",
+    b"sent.as",
+    b"sent.at",
+    b"sent.com",
+    b"siemprebox.com",
+    b"siempremail.com",
+    b"speedpost.net",
+    b"speedymail.org",
+    b"ssl-mail.com",
+    b"swift-mail.com",
+    b"the-fastest.net",
+    b"the-quickest.com",
+    b"theinternetemail.com",
+    b"veribox.net",
+    b"veryfast.biz",
+    b"veryspeedy.net",
+    b"warpmail.net",
+    b"xsmail.com",
+    b"yepmail.net",
+    b"your-mail.com",
+];
+
+type FastmailMatch<'a> = (&'a [u8], Option<&'a [u8]>);
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {
     InvalidEmail,
@@ -23,12 +159,12 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Provider { Custom, Gmail, Microsoft, Icloud, Proton, Yahoo }
+pub enum Provider { Custom, Gmail, Microsoft, Icloud, Proton, Yahoo, Fastmail }
 impl Provider {
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Custom => "custom", Self::Gmail => "gmail", Self::Microsoft => "microsoft",
-            Self::Icloud => "icloud", Self::Proton => "proton", Self::Yahoo => "yahoo",
+            Self::Icloud => "icloud", Self::Proton => "proton", Self::Yahoo => "yahoo", Self::Fastmail => "fastmail",
         }
     }
 }
@@ -138,19 +274,47 @@ fn parse_into(email: &str, output: &mut [u8], strict: bool) -> Result<EmailParts
     let dl = encoded.len();
     if dots == 0 || label_start == dl || dl - label_start > 63 || domain[label_start] == b'-' || domain[dl - 1] == b'-' { return Err(Invalid); }
     let domain = &domain[..dl];
-    let (provider, mapped): (Provider, &[u8]) = match domain {
-        b"gmail.com" | b"googlemail.com" => (Provider::Gmail, b"gmail.com"),
-        b"outlook.com" | b"hotmail.com" | b"live.com" | b"msn.com" => (Provider::Microsoft, domain),
-        b"icloud.com" | b"me.com" | b"mac.com" => (Provider::Icloud, b"icloud.com"),
-        b"proton.me" | b"protonmail.com" | b"pm.me" => (Provider::Proton, domain),
-        b"yahoo.com" | b"ymail.com" | b"rocketmail.com" => (Provider::Yahoo, domain),
-        _ => (Provider::Custom, domain),
+    let (provider, mapped, fastmail): (Provider, &[u8], Option<FastmailMatch<'_>>) = match domain {
+        b"gmail.com" | b"googlemail.com" => (Provider::Gmail, b"gmail.com", None),
+        b"outlook.com" | b"hotmail.com" | b"live.com" | b"msn.com" => (Provider::Microsoft, domain, None),
+        b"icloud.com" | b"me.com" | b"mac.com" => (Provider::Icloud, b"icloud.com", None),
+        b"proton.me" | b"protonmail.com" | b"protonmail.ch" | b"pm.me" => (Provider::Proton, domain, None),
+        b"yahoo.com" | b"ymail.com" | b"rocketmail.com" => (Provider::Yahoo, domain, None),
+        _ => {
+            let fastmail = if FASTMAIL_DOMAINS.binary_search(&domain).is_ok() {
+                Some((domain, None))
+            } else if dots >= 2 {
+                let dot = domain.iter().position(|&b| b == b'.').ok_or(Invalid)?;
+                let username = &domain[..dot];
+                let root = &domain[dot + 1..];
+                FASTMAIL_DOMAINS.binary_search(&root).ok().map(|_| (root, Some(username)))
+            } else { None };
+            if let Some((root, _)) = fastmail {
+                (Provider::Fastmail, root, fastmail)
+            } else {
+                (Provider::Custom, domain, None)
+            }
+        }
     };
     let mut ll = local_raw.len();
-    if !matches!(provider, Provider::Custom | Provider::Yahoo) {
+    if provider == Provider::Fastmail {
+        if let Some((_, Some(username))) = fastmail {
+            ll = username.len();
+            local[..ll].copy_from_slice(username);
+        } else if let Some(plus) = local[..ll].iter().position(|&b| b == b'+') { ll = plus; }
+    } else if !matches!(provider, Provider::Custom | Provider::Yahoo) {
         if let Some(plus) = local[..ll].iter().position(|&b| b == b'+') { ll = plus; }
     }
-    if provider == Provider::Gmail {
+    if provider == Provider::Proton {
+        let mut count = 0;
+        for i in 0..ll {
+            let b = local[i];
+            if matches!(b, b'.' | b'_' | b'-') { continue; }
+            local[count] = b;
+            count += 1;
+        }
+        ll = count;
+    } else if provider == Provider::Gmail {
         let mut count = 0;
         for i in 0..ll {
             let b = local[i];

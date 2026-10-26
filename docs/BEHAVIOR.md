@@ -1,6 +1,6 @@
 # Behavior contract
 
-The public operations normalize one supported address or reject it. All successful outputs are ASCII. A result contains `domain` (normalized input domain), `canonical` (matching address), and `provider` (`custom`, `gmail`, `microsoft`, `icloud`, `proton`, or `yahoo`). An identity result does not verify a person, mailbox, or provider account.
+The public operations normalize one supported address or reject it. All successful outputs are ASCII. A result contains `domain` (normalized input domain), `canonical` (matching address), and `provider` (`custom`, `gmail`, `microsoft`, `icloud`, `proton`, `fastmail`, or `yahoo`). An identity result does not verify a person, mailbox, or provider account.
 
 ## Input and cleanup order
 
@@ -44,13 +44,39 @@ ASCII `xn--` labels must pass native IDNA validation, including decoding and rev
 | `gmail` | `gmail.com`, `googlemail.com` | `gmail.com` | Yes | Yes |
 | `microsoft` | `outlook.com`, `hotmail.com`, `live.com`, `msn.com` | Unchanged | Yes | No |
 | `icloud` | `icloud.com`, `me.com`, `mac.com` | `icloud.com` | Yes | No |
-| `proton` | `proton.me`, `protonmail.com`, `pm.me` | Unchanged | Yes | No |
+| `proton` | `proton.me`, `protonmail.com`, `pm.me`, `protonmail.ch` | Unchanged | Yes | Yes, plus `_` and `-` |
+| `fastmail` | [Exact first-party roots](../testdata/fastmail-domains.txt), optionally one alias label before the root | Root unchanged | Yes | No |
 | `yahoo` | `yahoo.com`, `ymail.com`, `rocketmail.com` | Unchanged | No | No |
 | `custom` | All other accepted domains | Unchanged | No | No |
 
 Only the first `+` is used when removing a suffix. Custom domains are not classified through MX records. Google Workspace, Microsoft 365, and other custom-domain hosting do not opt a domain into these consumer-domain rules. Explicitly configured aliases with unrelated local parts cannot be resolved from the text of an address.
 
 Apple's legacy-domain relationship depends on account history. This package deliberately folds the listed domains as a matching policy; it cannot establish whether a particular user owns those legacy aliases. Microsoft and Proton domain names are not folded together. Yahoo hyphenated addresses are not folded to a guessed base address.
+
+## Provider additions in 0.2.0
+
+Proton first removes the first plus sign and suffix, then removes periods,
+underscores and hyphens from the retained local part. An empty result is invalid.
+Case folding and this punctuation rule apply only to the four exact Proton-owned
+domains, which remain distinct. Proton custom domains, random forwarding aliases
+and unrelated additional addresses are not inferred from text.
+
+Fastmail uses the static 130-domain allowlist in `testdata/fastmail-domains.txt`,
+checked against its official list on 2026-10-26 and embedded in every package.
+Direct addresses remove the first plus suffix but preserve dots. One-level
+`folder@user.fastmail.com` becomes `user@fastmail.com`, while `domain` remains
+`user.fastmail.com`. The full submitted local part and DNS labels are validated
+before rewriting, including characters inside a discarded tag. A subdomain alias
+cannot contain dots or underscores; multiple alias labels and custom-domain
+routing are not inferred. Every first-party root remains distinct. No DNS or MX
+lookup is performed.
+
+This changes saved matching keys for Proton punctuation, `protonmail.ch`, and
+Fastmail addresses. Audit collisions under the new version before rewriting stored
+keys; do not choose a winner, link accounts or silently merge users. Microsoft
+rules were already supported before 0.2.0 and remain unchanged. The historical
+Apple matching rule is unchanged and remains explicitly lossy; Gate's ownership
+policy continues to preserve Apple domains and local spelling instead.
 
 ## Size and return guarantees
 

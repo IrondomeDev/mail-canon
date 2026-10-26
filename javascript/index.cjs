@@ -4,6 +4,7 @@ let idna;
 const ASCII_SPACE = /^[\t\n\f\r ]+|[\t\n\f\r ]+$/g;
 const UNICODE_SPACE = /^[\u0009-\u000d\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+|[\u0009-\u000d\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+$/g;
 const NON_ASCII = /[^\x00-\x7f]/;
+const PROTON_SEPARATORS = /[._-]/g;
 const CLEAN = /[\u200b\u200c\u200d\ufeff\u2060\uff0e\u3002\uff61\u2024\uff0b\ufe62\uff20]/g;
 const MAPPINGS = new Map([
   ['\uff0e', '.'], ['\u3002', '.'], ['\uff61', '.'], ['\u2024', '.'],
@@ -13,7 +14,8 @@ const RULES = new Map([
   ['gmail.com', ['gmail', 'gmail.com']], ['googlemail.com', ['gmail', 'gmail.com']],
   ...['outlook.com', 'hotmail.com', 'live.com', 'msn.com'].map(d => [d, ['microsoft', d]]),
   ...['icloud.com', 'me.com', 'mac.com'].map(d => [d, ['icloud', 'icloud.com']]),
-  ...['proton.me', 'protonmail.com', 'pm.me'].map(d => [d, ['proton', d]]),
+  ...['proton.me', 'protonmail.com', 'protonmail.ch', 'pm.me'].map(d => [d, ['proton', d]]),
+  ...`123mail.org 150mail.com 150ml.com 16mail.com 2-mail.com 4email.net 50mail.com airpost.net aliencamel.com allmail.net bestmail.us cluemail.com elitemail.org emailcorner.net emailengine.net emailengine.org emailgroups.net emailplus.org emailuser.net eml.cc f-m.fm fast-email.com fast-mail.org fastem.com fastemail.us fastemailer.com fastest.cc fastimap.com fastmail.ca fastmail.cn fastmail.co.uk fastmail.com fastmail.com.au fastmail.de fastmail.es fastmail.fm fastmail.fr fastmail.im fastmail.in fastmail.jp fastmail.mx fastmail.net fastmail.nl fastmail.org fastmail.se fastmail.to fastmail.tw fastmail.uk fastmail.us fastmailbox.net fastmessaging.com fea.st fmail.co.uk fmailbox.com fmgirl.com fmguy.com foobox.com foobox.net ftml.net h-mail.us hailmail.net imap-mail.com imap.cc imapmail.org immerbox.com immermail.com inoutbox.com internet-e-mail.com internet-mail.org internetemails.net internetmailing.net jetemail.net justemail.net letterboxes.org lifetimeaddress.com mail-central.com mail-page.com mailas.com mailbolt.com mailc.net mailcan.com mailforce.net mailhaven.com mailingaddress.org mailite.com mailmight.com mailnew.com mailsent.net mailservice.ms mailup.net mailworks.org mailzone.com ml1.net mm.st myfastmail.com mymacmail.com nospammail.net onepost.net ownmail.net penguinmail.com permanentmail.com petml.com pobox.com postinbox.com postpro.net proinbox.com promessage.com realemail.net reallyfast.biz reallyfast.info rushpost.com sent.as sent.at sent.com siemprebox.com siempremail.com speedpost.net speedymail.org ssl-mail.com swift-mail.com the-fastest.net the-quickest.com theinternetemail.com veribox.net veryfast.biz veryspeedy.net warpmail.net xsmail.com yepmail.net your-mail.com`.split(/\s+/).map(d => [d, ['fastmail', d]]),
   ...['yahoo.com', 'ymail.com', 'rocketmail.com'].map(d => [d, ['yahoo', d]]),
 ]);
 const IDNA_OPTIONS = Object.freeze({
@@ -87,13 +89,28 @@ function parse(raw, identity, strict = false) {
     start = i + 1;
   }
   local = local.toLowerCase();
-  const rule = RULES.get(domain);
+  let rule = RULES.get(domain);
+  let fastmailSubdomain = '';
+  if (!rule) {
+    const dot = domain.indexOf('.');
+    if (dot > 0 && domain.indexOf('.', dot + 1) >= 0) {
+      const rootRule = RULES.get(domain.slice(dot + 1));
+      if (rootRule?.[0] === 'fastmail') {
+        rule = rootRule;
+        fastmailSubdomain = domain.slice(0, dot);
+      }
+    }
+  }
   const provider = rule ? rule[0] : 'custom';
   const mapped = rule ? rule[1] : domain;
-  if (provider !== 'custom' && provider !== 'yahoo') {
+  if (provider === 'fastmail' && fastmailSubdomain) {
+    // Fastmail's one-level recipient@alias.domain form routes to the alias.
+    local = fastmailSubdomain;
+  } else if (provider !== 'custom' && provider !== 'yahoo') {
     const plus = local.indexOf('+');
     if (plus >= 0) local = local.slice(0, plus);
   }
+  if (provider === 'proton') local = local.replace(PROTON_SEPARATORS, '');
   if (provider === 'gmail') {
     if (/[^a-z0-9.]/.test(local)) throw new InvalidEmail();
     local = local.replace(/\./g, '');

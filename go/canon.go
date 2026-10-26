@@ -27,6 +27,33 @@ var domainProfile = idna.New(idna.MapForLookup(), idna.Transitional(false),
 	idna.StrictDomainName(true), idna.ValidateLabels(true), idna.CheckHyphens(false),
 	idna.CheckJoiners(true), idna.BidiRule(), idna.VerifyDNSLength(false))
 
+// Fastmail first-party domains, matching the upstream source list bundled in
+// testdata/fastmail-domains.txt. Keep this table static: normalization is local.
+var fastmailDomains = map[string]struct{}{
+	"123mail.org": {}, "150mail.com": {}, "150ml.com": {}, "16mail.com": {}, "2-mail.com": {}, "4email.net": {}, "50mail.com": {},
+	"airpost.net": {}, "aliencamel.com": {}, "allmail.net": {}, "bestmail.us": {}, "cluemail.com": {}, "elitemail.org": {},
+	"emailcorner.net": {}, "emailengine.net": {}, "emailengine.org": {}, "emailgroups.net": {}, "emailplus.org": {}, "emailuser.net": {},
+	"eml.cc": {}, "f-m.fm": {}, "fast-email.com": {}, "fast-mail.org": {}, "fastem.com": {}, "fastemail.us": {},
+	"fastemailer.com": {}, "fastest.cc": {}, "fastimap.com": {}, "fastmail.ca": {}, "fastmail.cn": {}, "fastmail.co.uk": {},
+	"fastmail.com": {}, "fastmail.com.au": {}, "fastmail.de": {}, "fastmail.es": {}, "fastmail.fm": {}, "fastmail.fr": {},
+	"fastmail.im": {}, "fastmail.in": {}, "fastmail.jp": {}, "fastmail.mx": {}, "fastmail.net": {}, "fastmail.nl": {},
+	"fastmail.org": {}, "fastmail.se": {}, "fastmail.to": {}, "fastmail.tw": {}, "fastmail.uk": {}, "fastmail.us": {},
+	"fastmailbox.net": {}, "fastmessaging.com": {}, "fea.st": {}, "fmail.co.uk": {}, "fmailbox.com": {}, "fmgirl.com": {},
+	"fmguy.com": {}, "foobox.com": {}, "foobox.net": {}, "ftml.net": {}, "h-mail.us": {}, "hailmail.net": {},
+	"imap-mail.com": {}, "imap.cc": {}, "imapmail.org": {}, "immerbox.com": {}, "immermail.com": {}, "inoutbox.com": {},
+	"internet-e-mail.com": {}, "internet-mail.org": {}, "internetemails.net": {}, "internetmailing.net": {}, "jetemail.net": {}, "justemail.net": {},
+	"letterboxes.org": {}, "lifetimeaddress.com": {}, "mail-central.com": {}, "mail-page.com": {}, "mailas.com": {}, "mailbolt.com": {},
+	"mailc.net": {}, "mailcan.com": {}, "mailforce.net": {}, "mailhaven.com": {}, "mailingaddress.org": {}, "mailite.com": {},
+	"mailmight.com": {}, "mailnew.com": {}, "mailsent.net": {}, "mailservice.ms": {}, "mailup.net": {}, "mailworks.org": {},
+	"mailzone.com": {}, "ml1.net": {}, "mm.st": {}, "myfastmail.com": {}, "mymacmail.com": {}, "nospammail.net": {},
+	"onepost.net": {}, "ownmail.net": {}, "penguinmail.com": {}, "permanentmail.com": {}, "petml.com": {}, "pobox.com": {},
+	"postinbox.com": {}, "postpro.net": {}, "proinbox.com": {}, "promessage.com": {}, "realemail.net": {}, "reallyfast.biz": {},
+	"reallyfast.info": {}, "rushpost.com": {}, "sent.as": {}, "sent.at": {}, "sent.com": {}, "siemprebox.com": {},
+	"siempremail.com": {}, "speedpost.net": {}, "speedymail.org": {}, "ssl-mail.com": {}, "swift-mail.com": {}, "the-fastest.net": {},
+	"the-quickest.com": {}, "theinternetemail.com": {}, "veribox.net": {}, "veryfast.biz": {}, "veryspeedy.net": {}, "warpmail.net": {},
+	"xsmail.com": {}, "yepmail.net": {}, "your-mail.com": {},
+}
+
 func ascii(s string) bool {
 	for i := 0; i < len(s); i++ {
 		if s[i] >= utf8.RuneSelf {
@@ -169,13 +196,25 @@ func normalize(email string, strict bool) (Identity, error) {
 		provider = "microsoft"
 	case "icloud.com", "me.com", "mac.com":
 		provider, mapped = "icloud", "icloud.com"
-	case "proton.me", "protonmail.com", "pm.me":
+	case "proton.me", "protonmail.com", "protonmail.ch", "pm.me":
 		provider = "proton"
 	case "yahoo.com", "ymail.com", "rocketmail.com":
 		provider = "yahoo"
+	default:
+		if _, ok := fastmailDomains[domain]; ok {
+			provider = "fastmail"
+		} else if dot := strings.IndexByte(domain, '.'); dot > 0 && strings.IndexByte(domain[dot+1:], '.') >= 0 {
+			root := domain[dot+1:]
+			if _, ok := fastmailDomains[root]; ok {
+				provider, mapped = "fastmail", root
+				copy(localBytes[:], domain[:dot])
+			}
+		}
 	}
 	ll := len(local)
-	if provider != "custom" && provider != "yahoo" {
+	if provider == "fastmail" && mapped != domain {
+		ll = strings.IndexByte(domain, '.')
+	} else if provider != "custom" && provider != "yahoo" {
 		for i := 0; i < ll; i++ {
 			if localBytes[i] == '+' {
 				ll = i
@@ -193,6 +232,15 @@ func normalize(email string, strict bool) (Identity, error) {
 			if !(b >= 'a' && b <= 'z' || b >= '0' && b <= '9') {
 				return Identity{}, ErrInvalidEmail
 			}
+			localBytes[w] = b
+			w++
+		}
+		ll = w
+	} else if provider == "proton" {
+		w := 0
+		for i := 0; i < ll; i++ {
+			b := localBytes[i]
+			if b == '.' || b == '_' || b == '-' { continue }
 			localBytes[w] = b
 			w++
 		}

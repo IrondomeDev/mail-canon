@@ -31,6 +31,12 @@ except InvalidEmail:
     pass  # Ask the caller for a supported address.
 ```
 
+Provider examples: `normalize("U_s-e.r+tag@protonmail.ch").canonical` is
+`"user@protonmail.ch"`; `normalize("news@alice.fastmail.com")` returns
+`domain="alice.fastmail.com"`, `canonical="alice@fastmail.com"`, and
+`provider="fastmail"`. Fastmail matching uses a static exact first-party domain
+list and does not infer custom-domain mail routing.
+
 `EmailIdentity` is an immutable, slotted dataclass. Type annotations and `py.typed` are included. The Unicode IDNA library is imported only when a Unicode domain or ASCII Punycode label needs validation.
 
 
