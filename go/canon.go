@@ -240,7 +240,9 @@ func normalize(email string, strict bool) (Identity, error) {
 		w := 0
 		for i := 0; i < ll; i++ {
 			b := localBytes[i]
-			if b == '.' || b == '_' || b == '-' { continue }
+			if b == '.' || b == '_' || b == '-' {
+				continue
+			}
 			localBytes[w] = b
 			w++
 		}
