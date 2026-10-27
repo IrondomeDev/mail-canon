@@ -24,7 +24,7 @@ The MIT license is included at the root and in every package. Source review prec
 
 The package CI workflow builds and tests without publishing. The separate NuGet publishing workflow runs only when manually dispatched on `main`. Publish each package after its release commit passes CI:
 
-- Rust: `cargo publish` with a crates.io account and publishing token configured using `cargo login`.
+- Rust: use the manual `.github/workflows/publish-crates.yml` workflow. In the existing `mail-canon` crate settings, add a GitHub trusted publisher for owner `IrondomeDev`, repository `mail-canon`, workflow `publish-crates.yml`, environment `crates-io`. Dispatch first with `publish=false` to test/package, then `publish=true` with the reviewed manifest version. The pinned official Rust action exchanges GitHub OIDC for a temporary token and revokes it after the job; no stored registry token is needed. Alternatively, local `cargo publish` requires an authorized publishing token configured with `cargo login`. See [crates.io trusted publishing](https://crates.io/docs/trusted-publishing).
 - JavaScript: `npm publish --access public` after `npm login`. The unscoped package name is `mail-canon`, managed through the `irondome-dev:developers` organization team with read/write access. The existing SDK remains under `@irondome-dev`. Complete any requested browser/2FA approval. Verify organization access with `npm access list packages irondome-dev:developers --json`; publishing still authenticates an individual maintainer.
 - Go: push `go/vX.Y.Z` to the public repository, then resolve `github.com/IrondomeDev/mail-canon/go@vX.Y.Z` through the public Go proxy. No separate registry account is needed.
 - Python: publication is on hold pending PyPI organization approval.
