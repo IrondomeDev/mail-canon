@@ -30,7 +30,9 @@ fn strict_vectors() {
 }
 
 fn unhex(hex: &str) -> String {
-    let bytes: Vec<u8> = hex.as_bytes().chunks_exact(2).map(|pair| {
+    let (pairs, remainder) = hex.as_bytes().as_chunks::<2>();
+    assert!(remainder.is_empty(), "test vector must contain complete hex bytes");
+    let bytes: Vec<u8> = pairs.iter().map(|pair| {
         u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap()
     }).collect();
     String::from_utf8(bytes).unwrap()
