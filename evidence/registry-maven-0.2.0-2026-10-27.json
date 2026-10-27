@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-27",
+  "registry": "Maven Central",
+  "coordinates": "dev.irondome:mail-canon:0.2.0",
+  "verified": true,
+  "signatureFingerprint": "0CA8828CD11C009694783F29ACFB5AAA1CEE5253",
+  "verifiedArtifactSignatures": 4,
+  "files": [
+    {
+      "name": "mail-canon-0.2.0.jar",
+      "sha256": "56f2e20a7ab0a9247dc4857989c1d31307ca1e1f47b24160db71c17b0db07e71",
+      "bytes": 16043
+    },
+    {
+      "name": "mail-canon-0.2.0.jar.asc",
+      "sha256": "f877e114ec665beae96fb3e79fe682d13610481652b8f76634ab14648196517d",
+      "bytes": 833
+    },
+    {
+      "name": "mail-canon-0.2.0.pom",
+      "sha256": "03f7d86d7b4abbe2e6b98784c5218ccce3fd662d1e6265a14ae5d2777b8789cb",
+      "bytes": 3594
+    },
+    {
+      "name": "mail-canon-0.2.0.pom.asc",
+      "sha256": "5bdbf98fa7be3fd258ee160b4c75615580109900214a2a74f88b8fb00162f035",
+      "bytes": 833
+    },
+    {
+      "name": "mail-canon-0.2.0-sources.jar",
+      "sha256": "f7321dd494dd2daf77edbabe81f8a850cef447fad9d075eb1b2e69641c5b5641",
+      "bytes": 10396
+    },
+    {
+      "name": "mail-canon-0.2.0-sources.jar.asc",
+      "sha256": "50df8b299fb27655f2e57c23d22701ed8c7ed04fd1721bbe221e26e08539ff92",
+      "bytes": 833
+    },
+    {
+      "name": "mail-canon-0.2.0-javadoc.jar",
+      "sha256": "68d67365089b0fad582c13e78779b057b5a3fda1a4bb7ce99701ed8211875806",
+      "bytes": 96465
+    },
+    {
+      "name": "mail-canon-0.2.0-javadoc.jar.asc",
+      "sha256": "d1dd623f6d38b2a41379ec862fea38a11bde80c358f686b6d1e2b035989bb7d8",
+      "bytes": 833
+    }
+  ],
+  "workflow": "https://github.com/IrondomeDev/mail-canon/actions/runs/40470449360"
+}

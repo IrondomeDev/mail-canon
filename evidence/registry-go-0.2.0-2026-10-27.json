@@ -1,0 +1,15 @@
+{
+  "Path": "github.com/IrondomeDev/mail-canon/go",
+  "Version": "v0.2.0",
+  "Sum": "h1:cE+AAcV+7YjKApk5cRGD3wrpf1gGB+5crgk4CLrm7wg=",
+  "GoModSum": "h1:cSChnz6UcYF9C8IIpUj8rU5MPD7vKGvbzyv6i9zdYFk=",
+  "Origin": {
+    "VCS": "git",
+    "URL": "https://github.com/IrondomeDev/mail-canon",
+    "Subdir": "go",
+    "Hash": "89c1c5b79093927a25720692da0fc0c89615489c",
+    "Ref": "refs/tags/go/v0.2.0"
+  },
+  "registry": "public Go proxy",
+  "verified": true
+}

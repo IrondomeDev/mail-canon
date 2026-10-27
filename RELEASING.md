@@ -22,7 +22,7 @@ Public Packagist expects `composer.json` at the repository root; see its [submis
 
 The MIT license is included at the root and in every package. Source review precedes public releases; repository visibility and registry publishing are separate steps.
 
-The package CI workflow builds and tests without publishing. The separate NuGet publishing workflow runs only when manually dispatched on `main`. Publish each package after its release commit passes CI:
+The package CI workflow builds and tests without publishing. The separate NuGet, Rust and Maven publishing workflows run only when manually dispatched on `main`. Publish each package after its release commit passes CI:
 
 - Rust: use the manual `.github/workflows/publish-crates.yml` workflow. In the existing `mail-canon` crate settings, add a GitHub trusted publisher for owner `IrondomeDev`, repository `mail-canon`, workflow `publish-crates.yml`, environment `crates-io`. Dispatch first with `publish=false` to test/package, then `publish=true` with the reviewed manifest version. The pinned official Rust action exchanges GitHub OIDC for a temporary token and revokes it after the job; no stored registry token is needed. Alternatively, local `cargo publish` requires an authorized publishing token configured with `cargo login`. See [crates.io trusted publishing](https://crates.io/docs/trusted-publishing).
 - JavaScript: `npm publish --access public` after `npm login`. The unscoped package name is `mail-canon`, managed through the `irondome-dev:developers` organization team with read/write access. The existing SDK remains under `@irondome-dev`. Complete any requested browser/2FA approval. Verify organization access with `npm access list packages irondome-dev:developers --json`; publishing still authenticates an individual maintainer.
@@ -50,9 +50,12 @@ Matching rules and IDNA dependencies can change stored account keys. Document be
 Future release automation should publish only from reviewed tags, scope credentials to the relevant registry, and keep publishing separate from pull-request validation.
 
 
-## 0.2.0 provider candidate
+## 0.2.0 provider release
 
-All seven ports share the Proton/Fastmail policy addition and the updated vector
-corpora. This is a matching-policy change: publish version 0.2.0 only after the
-normal release checks, and require collision audits before downstream key migration.
-No registry publication or remote tag is created by these source changes.
+All seven ports share the Proton/Fastmail policy addition and updated vector
+corpora. Version 0.2.0 is verified on npm, crates.io, the public Go proxy,
+Packagist, NuGet and Maven Central. Python remains on hold pending PyPI
+organization approval. See [release verification](docs/VERIFICATION-RELEASE-2026-10-27.md)
+for source commits, workflow runs, artifact checks and signing-key rotation.
+This is a matching-policy change: collision audits are required before downstream
+stored-key migration. Each language's prefixed tag identifies its released source.

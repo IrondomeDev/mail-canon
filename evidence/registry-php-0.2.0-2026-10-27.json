@@ -1,0 +1,11 @@
+{
+  "registry": "Packagist",
+  "package": "irondome/mail-canon",
+  "version": "v0.2.0",
+  "verified": true,
+  "sourceRepository": "https://github.com/IrondomeDev/mail-canon",
+  "sourceCommit": "89c1c5b79093927a25720692da0fc0c89615489c",
+  "distributionRepository": "https://github.com/IrondomeDev/mail-canon-php",
+  "distributionCommit": "da907c566354de27173f81a195a87a5c3a50b232",
+  "workflow": "https://github.com/IrondomeDev/mail-canon-php/actions/runs/40468524952"
+}

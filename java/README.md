@@ -17,7 +17,7 @@ Add the [Maven Central package](https://central.sonatype.com/artifact/dev.irondo
 <dependency>
   <groupId>dev.irondome</groupId>
   <artifactId>mail-canon</artifactId>
-  <version>0.1.1</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 

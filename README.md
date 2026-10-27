@@ -40,19 +40,19 @@ Provider:   gmail
 | [php](php/README.md) | `irondome/mail-canon` | `MailCanon::normalize`, `canonicalize` |
 | [csharp](csharp/README.md) | `mail-canon` | `EmailNormalizer.Normalize`, `Canonicalize`, `TryNormalize` |
 
-The working tree prepares **0.2.0**, with Proton punctuation/legacy-domain support and Fastmail rules in all seven implementations. This candidate has not been published. Existing released versions below keep their original behavior. Stored canonical keys require an explicit collision-reviewed migration.
+**0.2.0** adds Proton punctuation/legacy-domain support and Fastmail rules in all seven implementations. It is published for JavaScript, Rust, Go, PHP, Java and C#; Python publication remains on hold pending PyPI organization approval. Stored canonical keys require an explicit collision-reviewed migration.
 
 Package releases are independent:
 
 | Language | Registry | Status |
 | --- | --- | --- |
-| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | Released: `0.1.1` |
-| Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.1.1` |
-| Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.1.1) | Released: `v0.1.1` |
+| JavaScript | [npm](https://www.npmjs.com/package/mail-canon) | Released: `0.2.0` |
+| Rust | [crates.io](https://crates.io/crates/mail-canon) | Released: `0.2.0` |
+| Go | [Go module](https://pkg.go.dev/github.com/IrondomeDev/mail-canon/go@v0.2.0) | Released: `v0.2.0` |
 | Python | PyPI | Pending organization approval; install from source |
-| PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.1.1` |
-| Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | `0.1.0` released; `0.1.1` publishing |
-| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | Released: `0.1.1` |
+| PHP | [Packagist](https://packagist.org/packages/irondome/mail-canon) | Released: `0.2.0` |
+| Java | [Maven Central](https://central.sonatype.com/artifact/dev.irondome/mail-canon) | Released: `0.2.0` |
+| C# | [NuGet](https://www.nuget.org/packages/mail-canon) | Released: `0.2.0` |
 
 See [GitHub releases](https://github.com/IrondomeDev/mail-canon/releases) for versioned release notes and the [release guide](RELEASING.md) for registry setup.
 
@@ -90,13 +90,13 @@ For Rust, add to your application's `Cargo.toml`:
 
 ```toml
 [dependencies]
-mail-canon = "0.1.0"
+mail-canon = "0.2.0"
 ```
 
 For Go, run from an existing application module:
 
 ```sh
-go get github.com/IrondomeDev/mail-canon/go@v0.1.0
+go get github.com/IrondomeDev/mail-canon/go@v0.2.0
 ```
 
 Use strict APIs for untrusted address fields. Display-name imports have a separate, more permissive parsing policy described below.

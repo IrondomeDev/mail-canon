@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-27T07:40:19.613Z",
+  "registry": "npm",
+  "name": "mail-canon",
+  "version": "0.2.0",
+  "latest": "0.2.0",
+  "tarball": "https://registry.npmjs.org/mail-canon/-/mail-canon-0.2.0.tgz",
+  "sha256": "908f7bb9fe01b682665bb3c857751a0ec8e21be8fc4af2d99cb2400b842b25fb",
+  "integrity": "sha512-Gbdd0uaxH4wnYK0VvqH+QgHshsweABhcPNiXYLqTN4Jfic0MHxL35WbU5H0PvAkGi6qhmpY8gFMS5x5uokCi2g==",
+  "verified": true
+}

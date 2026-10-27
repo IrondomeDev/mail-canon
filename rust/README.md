@@ -14,7 +14,7 @@ Add the package to your application's `Cargo.toml`:
 
 ```toml
 [dependencies]
-mail-canon = "0.1.1"
+mail-canon = "0.2.0"
 ```
 
 ```rust

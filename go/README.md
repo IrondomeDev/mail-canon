@@ -13,7 +13,7 @@ Go 1.25+ and `golang.org/x/net/idna`.
 In an existing application module:
 
 ```sh
-go get github.com/IrondomeDev/mail-canon/go@v0.1.1
+go get github.com/IrondomeDev/mail-canon/go@v0.2.0
 ```
 
 ```go

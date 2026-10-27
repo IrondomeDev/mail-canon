@@ -14,7 +14,7 @@ No network access, telemetry, or mailbox lookup.
 Install the [NuGet package](https://www.nuget.org/packages/mail-canon):
 
 ```sh
-dotnet add package mail-canon --version 0.1.1
+dotnet add package mail-canon --version 0.2.0
 ```
 
 ```csharp

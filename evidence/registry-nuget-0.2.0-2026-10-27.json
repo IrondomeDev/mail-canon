@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-27",
+  "registry": "NuGet",
+  "package": "mail-canon",
+  "version": "0.2.0",
+  "sha256": "5a57c200c449a93b14d1c618810801e4b20f171995f06e33ec84c31f60def8c9",
+  "files": [
+    "_rels/.rels",
+    "mail-canon.nuspec",
+    "API.md",
+    "LICENSE",
+    "README.md",
+    "lib/net8.0/MailCanon.dll",
+    "[Content_Types].xml",
+    "package/services/metadata/core-properties/nuget.psmdcp",
+    ".signature.p7s"
+  ],
+  "verified": true,
+  "workflow": "https://github.com/IrondomeDev/mail-canon/actions/runs/40468657523"
+}
